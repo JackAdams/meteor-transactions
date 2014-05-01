@@ -2,6 +2,6 @@
   display: inline-block;	
 }
 
-.hide-undo-button, .hide-redo-button {
+#undo-redo .hide-undo-button, #undo-redo .hide-redo-button {
   display: none;
 }

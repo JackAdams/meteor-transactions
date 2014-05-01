@@ -1,13 +1,11 @@
 <template name="undo_redo">
-  {{#if editing}}
-    <div id="undo-redo">
-      <button id="redo-button" class="{{hideRedoButton}}">
-        <span class="undo-redo-action">{{action 'redo'}}</span> Redo <i class="fa fa-repeat"></i>
-      </button>
-      <br />
-      <button id="undo-button" class="{{hideUndoButton}}">
-        <i class="fa fa-undo"></i> Undo <span class="undo-redo-action">{{action 'undo'}}</span>
-      </button>
-    </div>
-  {{/if}}
+  <div id="undo-redo">
+    <button id="redo-button" class="{{hideRedoButton}}">
+      <span class="undo-redo-action">{{action 'redo'}}</span> Redo <i class="fa fa-repeat"></i>
+    </button>
+    <br />
+    <button id="undo-button" class="{{hideUndoButton}}">
+      <i class="fa fa-undo"></i> Undo <span class="undo-redo-action">{{action 'undo'}}</span>
+    </button>
+  </div>
 </template>

@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "Undo/Redo writes to collections"
+  summary: "Undo/Redo stack based on transactions"
 });
 
 Package.on_use(function (api, where) {

@@ -1,6 +1,6 @@
 {
   "name": "transactions",
-  "description": "Undo/Redo writes to collections",
+  "description": "Undo/Redo stack based on transactions",
   "homepage": "https://github.com/JackAdams/meteor-transactions",
   "author": "Brent Abrahams <brent_abrahams@yahoo.com>",
   "version": "0.1.0",

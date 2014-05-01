@@ -1,0 +1,8 @@
+{
+  "name": "transactions",
+  "description": "Undo/Redo writes to collections",
+  "homepage": "https://github.com/JackAdams/meteor-transactions",
+  "author": "Brent Abrahams <brent_abrahams@yahoo.com>",
+  "version": "0.1.0",
+  "git": "https://github.com/JackAdams/meteor-transactions.git"
+}

@@ -1,3 +1,7 @@
+#undo-redo {
+  display: inline-block;	
+}
+
 .hide-undo-button, .hide-redo-button {
   display: none;
 }

@@ -10,7 +10,8 @@ Package.on_use(function (api, where) {
   api.use('templating', 'client');
   api.use('handlebars', 'client');
   api.use('underscore', ['client', 'server']);
-   
+  api.use('accounts-ui', ['client', 'server']);
+
   api.add_files('lib/transactions_client.html', 'client');
   api.add_files('lib/transactions_client.js', 'client');
   api.add_files('lib/transactions_client.css', 'client');

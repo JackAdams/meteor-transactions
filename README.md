@@ -9,7 +9,7 @@ An example app is up at [http://transactions.meteor.com/](http://transactions.me
 
 	mrt add transactions
 
-This is not a "just add it and it magically works" type of package (like many great Meteor packages are). Some config is required.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
+This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are). Some config is required.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
 In your app, you'll need something like this:
 
@@ -18,9 +18,9 @@ In your app, you'll need something like this:
 	  "comments" : Comments
 	}
 
-The keys are the mongo collection names as defined in `Posts = new Meteor.Collection("posts")` and the values are the Meteor collections like `Posts`.  The transactions package won't work without tx.collectionIndex being defined.  Make sure you define this *after* the Meteor collections have been defined, in a file that is available on both client and server.
+The keys are the mongo collection names as defined in `Posts = new Meteor.Collection("posts")` and the values are the Meteor collections like `Posts`.  The transactions package won't work without `tx.collectionIndex` being defined.  Make sure you define this *after* the Meteor collections have been defined, in a file that is available on both client and server.
 
-For any collection in the tx.collectionIndex object, you can make writes using the syntax shown beneath the more familiar API:
+For any collection listed in the `tx.collectionIndex` object, you can make writes using the syntax shown below (regular methods shown above each example for comparison):
 
 	Posts.insert({text:"My post"});
 	tx.insert(Posts,{text:"My post"});

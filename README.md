@@ -89,7 +89,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 7. For updates, there is an option to provide a custom inverse operation if the transaction package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
 
-	"inverse": {
+	`"inverse": {
 	  "command": "$set",
 	  "data": [
 		{
@@ -97,7 +97,7 @@ Now this post can be restored, along with all its comments, with one click of th
 		  "value": "My old post text"
 		}
 	  ]
-	}
+	}`
 
 8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your allow and deny rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the client and your database, unless you do some other permission checking before executing the method.
 

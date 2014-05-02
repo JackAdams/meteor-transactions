@@ -63,11 +63,13 @@ Note also that the argument passed to `tx.start()` is the text that will appear 
 
 Now this post can be restored, along with all its comments, with one click of the "undo" button. (And then re-removed with a click of the "redo" button.)
 
-#### Things it is helpful to know
+#### Things it's helpful to know
 
-1. Logging is on by default. You can turn if off by setting `tx.logging = false;`
+1. Logging is on by default. You can turn if off by setting `tx.logging = false;`. It's quite handy for debugging. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows: `tx.log = function(message) { <Your own logging logic> }`.
 
 2. To run all actions through your own custom permission check, write a function `tx.checkPermission(action,collection,doc,modifier) = function() { <Your permission check logic> };`. The parameters your function receives are as follows: "action" will be a string - either "insert", "update" or "remove", "collection" will be the actual Meteor collection object - you can query it if you need to, "doc" will be the document in question, and "modifier" will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions).
+
+3. The end user only gets (by default) the set of transactions they made from 5 minutes before their last browser refresh. All transactions persist until the next browser refresh, so if a user last refreshed their browser 40 minutes ago, they'll have 45 minutes worth of transactions in their client-side stack. This time can be changed by setting `tx.undoTimeLimit = <number of seconds>`.
 
 #### What does it do?
 
@@ -79,18 +81,36 @@ Now this post can be restored, along with all its comments, with one click of th
 
 3. Once permission checking is complete, it executes the actions in the order they were queued (this is important, see 4.). If an error is caught, it will roll back all actions that have been executed so far and will not execute any further actions. The queue will be cleared and it will wait for the next transaction.
 
-4. You can specify a couple of options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter for `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later. If a roll back is found to be required the action will be un-done. This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be gone from the collection.
+4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter for `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later. If a roll back is found to be required the action will be un-done. This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be gone from the collection.
 
 5. The other option is "overridePermissionCheck": `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 6.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
 
-6. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your allow and deny rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the client and your database, unless you do some other permission checking before executing the method.
+6. If you want to do custom filtering of the tx.Transactions in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context:{}`, but you can overwrite `tx.makeContext = function(action,collection,doc,modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context:{ <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context:{}}` for the subsequent actions. 
 
-7. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or deleted via a transaction. `deleted:1` is added to any removed document and then the `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is a pain having to handle the check on the `deleted` field yourself.
+7. For updates, there is an option to provide a custom inverse operation if the transaction package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
 
-8. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
+	"inverse": {
+	  "command": "$set",
+	  "data": [
+		{
+		  "key": "text",
+		  "value": "My old post text"
+		}
+	  ]
+	}
+
+8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your allow and deny rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the client and your database, unless you do some other permission checking before executing the method.
+
+9. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or deleted via a transaction. `deleted:1` is added to any removed document and then the `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is a pain having to handle the check on the `deleted` field yourself.
+
+10. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
+
+11. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
+
+12. The only update commands we currently support are `$set`, `$unset`, `$addToSet`, `$push` and `$pull`. We've got an incredible amount of mileage out of these so far (see below).
 
 #### In production? Really?
 
-We've been using this package in a production app for almost a year now and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
+We've been using this package in a large, complex, production app for almost a year now and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
 The production app is [Standbench](http://www.standbench.com), which does electronic curriculum housing and management for schools.

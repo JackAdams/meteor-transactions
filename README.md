@@ -5,4 +5,4 @@ This package is used to give the end user an infinite undo/redo stack, based on 
 
 An example app is up at [http://transactions.meteor.com/](http://transactions.meteor.com/).
 
-Documentation coming soon.
+Full documentation coming soon.

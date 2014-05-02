@@ -3,6 +3,6 @@
   "description": "Undo/Redo stack based on transactions",
   "homepage": "https://github.com/JackAdams/meteor-transactions",
   "author": "Brent Abrahams <brent_abrahams@yahoo.com>",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "git": "https://github.com/JackAdams/meteor-transactions.git"
 }

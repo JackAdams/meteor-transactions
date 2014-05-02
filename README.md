@@ -83,11 +83,11 @@ Now this post can be restored, along with all its comments, with one click of th
 
 4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter for `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later. If a roll back is found to be required the action will be un-done. This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be gone from the collection.
 
-5. The other option is "overridePermissionCheck": `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 6.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
+5. Another option is "overridePermissionCheck": `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 6.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
 
 6. If you want to do custom filtering of the tx.Transactions in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context:{}`, but you can overwrite `tx.makeContext = function(action,collection,doc,modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context:{ <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context:{}}` for the subsequent actions. 
 
-7. For updates, there is an option to provide a custom inverse operation if the transaction package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
+7. For updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
 
 	`"inverse": {
 	  "command": "$set",

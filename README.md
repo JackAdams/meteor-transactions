@@ -9,7 +9,7 @@ An example app is up at [http://transactions.meteor.com/](http://transactions.me
 
 	mrt add transactions
 
-This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are). Some config is required.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
+This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are). Some config is required and there's a custom API to code against.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
 In your app, you'll need something like this:
 
@@ -35,7 +35,7 @@ Note: instead of the post_id, you can just throw in the whole post document. E.g
 
 The last thing you'll need to do is include the undo/redo buttons widget:
 
-	{{> undoRedoButton}}
+	{{> undoRedoButtons}}
 
 If it doesn't fit nicely into your app's design, you can write your own widget. The only thing you need to do is have an event handler that fires these calls:
 
@@ -65,7 +65,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 #### Things it's helpful to know
 
-1. Logging is on by default. You can turn if off by setting `tx.logging = false;`. It's quite handy for debugging. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows: `tx.log = function(message) { <Your own logging logic> }`.
+1. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows: `tx.log = function(message) { <Your own logging logic> }`.
 
 2. To run all actions through your own custom permission check, write a function `tx.checkPermission(action,collection,doc,modifier) = function() { <Your permission check logic> };`. The parameters your function receives are as follows: "action" will be a string - either "insert", "update" or "remove", "collection" will be the actual Meteor collection object - you can query it if you need to, "doc" will be the document in question, and "modifier" will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions).
 
@@ -85,7 +85,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 5. Another option is "overridePermissionCheck": `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 6.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
 
-6. If you want to do custom filtering of the tx.Transactions in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context:{}`, but you can overwrite `tx.makeContext = function(action,collection,doc,modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context:{ <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context:{}}` for the subsequent actions. 
+6. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context:{}`, but you can overwrite `tx.makeContext = function(action,collection,doc,modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context:{ <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context:{}}` for the subsequent actions. 
 
 7. For updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
 
@@ -99,7 +99,7 @@ Now this post can be restored, along with all its comments, with one click of th
 	  ]
 	}`
 
-8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your allow and deny rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the client and your database, unless you do some other permission checking before executing the method.
+8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your allow and deny rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the client and your database, unless you do some other permission checking before executing the method.
 
 9. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or deleted via a transaction. `deleted:1` is added to any removed document and then the `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is a pain having to handle the check on the `deleted` field yourself.
 

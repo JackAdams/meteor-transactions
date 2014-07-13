@@ -55,7 +55,7 @@ If you want a transaction that encompasses actions on several documents, you nee
 
 	tx.start("delete post");
 	tx.remove(Posts,post_id);
-	_.each(Comments.find({post_id:post_id}).fetch(),function(comment) {
+	Comments.find({post_id:post_id}).forEach(function(comment) {
 	  tx.remove(Comments,comment); // comment._id would work equally well as the second argument
 	});
 	tx.commit();
@@ -69,7 +69,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 1. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows: `tx.log = function(message) { <Your own logging logic> }`.
 
-2. To run all actions through your own custom permission check, write a function `tx.checkPermission(action,collection,doc,modifier) = function() { <Your permission check logic> };`. The parameters your function receives are as follows: `action` will be a string - either "insert", "update" or "remove", `collection` will be the actual Meteor collection object - you can query it if you need to, `doc` will be the document in question, and `modifier` will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions).
+2. To run all actions through your own custom permission check, write a function `tx.checkPermission = function(action,collection,doc,modifier) { <Your permission check logic> };`. The parameters your function receives are as follows: `action` will be a string - either "insert", "update" or "remove", `collection` will be the actual Meteor collection object - you can query it if you need to, `doc` will be the document in question, and `modifier` will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions).
 
 3. The end user only gets (by default) the set of transactions they made from 5 minutes before their last browser refresh. All transactions persist until the next browser refresh, so if a user last refreshed their browser 40 minutes ago, they'll have 45 minutes worth of transactions in their client-side stack. This time can be changed by setting `tx.undoTimeLimit = <number of seconds>`.
 

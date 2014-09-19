@@ -9,7 +9,7 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 #### Quick Start
 
-	mrt add transactions
+	meteor add babrahams:transactions
 
 This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are). Some config is required and there's a custom API to code against.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
@@ -20,7 +20,7 @@ In your app, you'll need something like this:
 	  "comments" : Comments
 	}
 
-The keys are the mongo collection names as defined in `Posts = new Meteor.Collection("posts")` and the values are the Meteor collections like `Posts`.  The transactions package won't work without `tx.collectionIndex` being defined.  Make sure you define this *after* the Meteor collections have been defined, in a file that is available on both client and server.
+The keys are the mongo collection names as defined in `Posts = new Mongo.Collection("posts")` and the values are the Meteor collections like `Posts`.  The transactions package won't work without `tx.collectionIndex` being defined.  Make sure you define this *after* the Meteor collections have been defined, in a file that is available on both client and server.
 
 For any collection listed in the `tx.collectionIndex` object, you can make writes using the syntax shown below (regular methods shown above each example for comparison):
 
@@ -101,7 +101,7 @@ Now this post can be restored, along with all its comments, with one click of th
 	  ]
 	}`
 
-8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the method code and your database, unless you do some other permission checking within the method before execting a transaction.
+8. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the method code and your database, unless you do some other permission checking within the method before executing a transaction.
 
 9. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or deleted via a transaction. `deleted:<unix timestamp>` is added to any removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself.
 

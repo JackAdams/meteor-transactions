@@ -41,10 +41,6 @@
       "1.0.0"
     ],
     [
-      "handlebars",
-      "1.0.0"
-    ],
-    [
       "htmljs",
       "1.0.0-cordova1"
     ],
@@ -93,8 +89,8 @@
       "1.0.0"
     ],
     [
-      "startup",
-      "1.0.0"
+      "spacebars",
+      "1.0.1"
     ],
     [
       "templating",

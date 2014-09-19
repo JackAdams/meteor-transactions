@@ -1,8 +1,28 @@
 {
   "dependencies": [
     [
+      "application-configuration",
+      "1.0.1-glasser1"
+    ],
+    [
+      "binary-heap",
+      "1.0.0"
+    ],
+    [
       "blaze",
       "1.0.0"
+    ],
+    [
+      "callback-hook",
+      "1.0.0"
+    ],
+    [
+      "check",
+      "1.0.0"
+    ],
+    [
+      "ddp",
+      "1.0.1-ekate"
     ],
     [
       "deps",
@@ -11,6 +31,10 @@
     [
       "ejson",
       "1.0.0"
+    ],
+    [
+      "follower-livedata",
+      "1.0.1-rc0"
     ],
     [
       "geojson-utils",
@@ -37,12 +61,20 @@
       "1.0.0"
     ],
     [
+      "logging",
+      "1.0.0"
+    ],
+    [
       "meteor",
       "1.1.0"
     ],
     [
       "minimongo",
       "1.0.3"
+    ],
+    [
+      "mongo",
+      "1.0.5"
     ],
     [
       "observe-sequence",
@@ -54,6 +86,10 @@
     ],
     [
       "random",
+      "1.0.0"
+    ],
+    [
+      "retry",
       "1.0.0"
     ],
     [

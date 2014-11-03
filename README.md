@@ -24,13 +24,13 @@ The keys are the mongo collection names as defined in `Posts = new Mongo.Collect
 
 For any collection listed in the `tx.collectionIndex` object, you can make writes using the syntax shown below (regular methods shown above each example for comparison):
 
-	Posts.insert({text:"My post"});
+	// Posts.insert({text:"My post"});
 	tx.insert(Posts,{text:"My post"});
 	
-	Posts.update({_id:post_id},{$set:{text:"My improved post"}});
+	// Posts.update({_id:post_id},{$set:{text:"My improved post"}});
 	tx.update(Posts,post_id,{$set:{text:"My improved post"}});
 	
-	Posts.remove({_id:post_id});
+	// Posts.remove({_id:post_id});
 	tx.remove(Posts,post_id);
 
 Note: instead of the post_id, you can just throw in the whole post document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`

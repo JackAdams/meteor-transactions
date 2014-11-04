@@ -121,8 +121,8 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 #### Roadmap
 
-0.3 [Beta released] Add callbacks to `tx.commit()`  
-0.4 Remove the need for tx.collectionIndex, using dburles:mongo-collection-instances package  
+0.3 [beta released] Add callbacks to `tx.commit()`  
+0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package  
 0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API  
 0.6 Add support for `simple-schema`  
 0.7 Add/improve support for other/existing mongo operators  

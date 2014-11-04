@@ -121,14 +121,14 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 #### Roadmap
 
-0.3 [Beta released] Add callbacks to `tx.commit()`
-0.4 Remove the need for tx.collectionIndex, using dburles:mongo-collection-instances package
-0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API
-0.6 Add support for `simple-schema`
-0.7 Add/improve support for other/existing mongo operators
-0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly
-0.9 Tests
-1.0 Security audit
+0.3 [Beta released] Add callbacks to `tx.commit()`  
+0.4 Remove the need for tx.collectionIndex, using dburles:mongo-collection-instances package  
+0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API  
+0.6 Add support for `simple-schema`  
+0.7 Add/improve support for other/existing mongo operators  
+0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly  
+0.9 Tests  
+1.0 Security audit  
 1.1 Operational Transform
 
 As you can see from the roadmap, there are a lot of things missing from this package. I can't, in all good conscience, recommend using it in production in its current form (even though I myself do).

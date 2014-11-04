@@ -126,7 +126,7 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API
 0.6 Add support for `simple-schema`
 0.7 Add/improve support for other/existing mongo operators
-0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/) properly
+0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly
 0.9 Tests
 1.0 Security audit
 1.1 Operational Transform

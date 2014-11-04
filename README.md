@@ -83,7 +83,9 @@ Now this post can be restored, along with all its comments, with one click of th
 
 3. Once permission checking is complete, it executes the actions in the order they were queued (this is important, see 4.). If an error is caught, it will roll back all actions that have been executed so far and will not execute any further actions. The queue will be cleared and it will wait for the next transaction.
 
-4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).
+4. (a) You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).
+
+   (b) For single actions that auto-commit, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as `callback` in the options hash. E.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. Note that callbacks are __not__ fired on every action in a `tx.start() ... tx.commit()` block. In this scenario, a single callback can be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err,res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` if the transaction was unsuccessful; `res` takes a value of `true` if the transaction was successful and will be falsey if the transaction was rolled back; `this` is an object of the form `{transaction_id:<transaction_id>,writes:<an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
 5. Another option is `overridePermissionCheck`: `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 8.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
 
@@ -109,7 +111,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 11. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
 
-12. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$push` and `$pull`. We've got a great amount of mileage out of these so far (see below).
+12. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of these so far (see below).
 
 #### In production? Really?
 

@@ -1,6 +1,6 @@
 Package.describe({
   summary: "Undo/Redo stack based on transactions",
-  version: "0.3.0",
+  version: "0.3.1",
   git: "https://github.com/jackadams/meteor-transactions.git",
   name: "babrahams:transactions"
 });

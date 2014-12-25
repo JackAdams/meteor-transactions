@@ -11,18 +11,9 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 	meteor add babrahams:transactions
 
-This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are). Some config is required and there's a custom API to code against.  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
+This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are).  At the moment, there's a custom API to code against (see below).  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
-In your app, you'll need something like this:
-
-	tx.collectionIndex = {
-	  "posts" : Posts,
-	  "comments" : Comments
-	}
-
-The keys are the mongo collection names as defined in `Posts = new Mongo.Collection("posts")` and the values are the Meteor collections like `Posts`.  The transactions package won't work without `tx.collectionIndex` being defined.  Make sure you define this *after* the Meteor collections have been defined, in a file that is available on both client and server.
-
-For any collection listed in the `tx.collectionIndex` object, you can make writes using the syntax shown below (regular methods shown above each example for comparison):
+You can make writes using the syntax shown below (the regular methods are shown above each example for comparison):
 
 	// Posts.insert({text:"My post"});
 	tx.insert(Posts,{text:"My post"});
@@ -121,8 +112,8 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 #### Roadmap
 
-0.3 [beta released] Add callbacks to `tx.commit()`  
-0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package  
+~~0.3 Add callbacks to `tx.commit()`~~
+~~0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package~~  
 0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API  
 0.6 Add support for `simple-schema`  
 0.7 Add/improve support for other/existing mongo operators  

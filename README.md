@@ -11,20 +11,27 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 	meteor add babrahams:transactions
 
-This is not a just-add-it-and-it-magically-works type package (like many great Meteor packages are).  At the moment, there's a custom API to code against (see below).  The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
+The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
-You can make writes using the syntax shown below (the regular methods are shown above each example for comparison):
+You can make writes using either of the (equivalent) syntax styles shown below to make them undo/redo-able:
 
-	// Posts.insert({text:"My post"});
-	tx.insert(Posts,{text:"My post"});
+Instead of 
+
+	`Posts.insert({text:"My post"});` 
+
+write:
 	
-	// Posts.update({_id:post_id},{$set:{text:"My improved post"}});
-	tx.update(Posts,post_id,{$set:{text:"My improved post"}});
+	`Posts.insert({text:"My post"},{tx:true});` 
 	
-	// Posts.remove({_id:post_id});
-	tx.remove(Posts,post_id);
+or (the equivalent)
 
-Note: instead of the post_id, you can just throw in the whole post document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
+	`tx.insert(Posts,{text:"My post"});`
+	
+Instead of Posts.update({_id:post_id},{$set:{text:"My improved post"}});` write `Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});` or `tx.update(Posts,post_id,{$set:{text:"My improved post"}});`
+
+Instead of `Posts.remove({_id:post_id});` write `Posts.remove({_id:post_id},{tx:true});` or `tx.remove(Posts,post_id);`
+
+Note for the second syntax style: instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
 The last thing you'll need to do is include the undo/redo buttons widget:
 
@@ -45,7 +52,7 @@ The examples above will automatically start a transaction and automatically comm
 If you want a transaction that encompasses actions on several documents, you need to explictly start and commit the transaction:
 
 	tx.start("delete post");
-	tx.remove(Posts,post_id);
+	tx.remove(Posts,post_id); // or Posts.remove({_id:post_id},{tx:true});
 	Comments.find({post_id:post_id}).forEach(function(comment) {
 	  tx.remove(Comments,comment); // comment._id would work equally well as the second argument
 	});

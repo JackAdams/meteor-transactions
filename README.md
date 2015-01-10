@@ -150,9 +150,9 @@ Now this post can be restored, along with all its comments, with one click of th
 
 #### In production? Really?
 
-We've been using this package in a large, complex, production app for over a year now and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
+We've been using this package in a large, complex, production app for over 18 months now and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
-The production app is [Standbench](http://www.standbench.com), which provides electronic curriculum housing and management for schools.
+The production app is [Standbench](http://www.standbench.com), which provides online curriculum housing and management for schools.
 
 #### Roadmap
 

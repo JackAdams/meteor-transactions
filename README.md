@@ -22,7 +22,9 @@ Instead of
 write:
 
 	Posts.insert({text:"My post"},{tx:true});
-	// or
+	
+	// OR
+	
 	tx.insert(Posts,{text:"My post"});
 	
 Instead of
@@ -32,7 +34,9 @@ Instead of
 write
 
 	Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});
-	// or
+	
+	// OR
+	
 	tx.update(Posts,post_id,{$set:{text:"My improved post"}});
 
 Instead of
@@ -42,12 +46,16 @@ Instead of
 write
 
 	Posts.remove({_id:post_id},{tx:true});
-	// or
+	
+	// OR
+	
 	tx.remove(Posts,post_id);
 
 Note for the second syntax style: instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
-The last thing you'll need to do is include the undo/redo buttons widget:
+_We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the babrahams:transactions package. The second syntax is really just to support older apps and packages that rely on it._
+
+The last thing you'll need to do is include the undo/redo buttons widget in a template:
 
 	{{> undoRedoButtons}}
 
@@ -135,13 +143,22 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 ~~0.3 Add callbacks to `tx.commit()`~~
 
-~~0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package~~  
-0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API  
-0.6 Add support for `simple-schema`  
-0.7 Add/improve support for other/existing mongo operators  
-0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly  
-0.9 Tests  
-1.0 Security audit  
-1.1 Operational Transform
+~~0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package~~
 
-As you can see from the roadmap, there are a lot of things missing from this package. I can't, in all good conscience, recommend using it in production in its current form (even though I myself do).
+~~0.4.5 Add support for `simple-schema`~~
+
+~~0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API~~   
+
+0.6 Add/improve support for other/existing mongo operators
+
+0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly  
+
+0.9 Tests  
+
+1.0 Security audit  
+
+_1.0+ Operational Transform_
+
+_1.0+ Look into support for {multi:true}_
+
+As you can see from the roadmap, there are still a lot of things missing from this package. I currently use it in a production app, but it's very much a case of use at your own risk.

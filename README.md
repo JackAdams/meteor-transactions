@@ -115,20 +115,20 @@ The parameters your function receives are as follows: `action` will be a string 
 
 4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).  For example, in a RPG where a new player gets a few items by default:
 
-	tx.start('add new player');
-	var newPlayerId = Players.insert({name:"New player"},{tx:true,instant:true}); // We need to use the new _id value returned by Players.insert
-	var newPlayerDefaultItems = [
-	  {name:"Sword",type:"weapon",attack:5},
-	  {name:"Shield",type:"armor",defence:4},
-	  {name:"Cloak",type:"clothing",warmth:3}
-	];
-	_.each(newPlayerDefaultItems,function(item) {
-	  item.player_id = newPlayerId;
-	  Items.insert(item,{tx:true}); // Doesn't need to be instant as we don't do anything with these new _id values
-	});
-	tx.commit();
+		tx.start('add new player');
+		var newPlayerId = Players.insert({name:"New player"},{tx:true,instant:true}); // We need to use the new _id value returned by Players.insert
+		var newPlayerDefaultItems = [
+		  {name:"Sword",type:"weapon",attack:5},
+		  {name:"Shield",type:"armor",defence:4},
+		  {name:"Cloak",type:"clothing",warmth:3}
+		];
+		_.each(newPlayerDefaultItems,function(item) {
+		  item.player_id = newPlayerId;
+		  Items.insert(item,{tx:true}); // Doesn't need to be instant as we don't do anything with these new _id values
+		});
+		tx.commit();
 
-_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as a option hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
+	_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as a option hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
 
 5. For single actions that auto-commit, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as the parameter after the options parameter. In rare situation you might find you need to pass your callback function explicitly as `callback` in the options hash. E.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. Note that callbacks are __not__ fired on every action in a `tx.start() ... tx.commit()` block. In this scenario, a single callback can be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err,res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` if the transaction was unsuccessful; `res` takes a value of `true` if the transaction was successful and will be falsey if the transaction was rolled back; `this` is an object of the form `{transaction_id:<transaction_id>,writes:<an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
@@ -138,15 +138,15 @@ _Note: the options can also be passed as follows: `Players.insert({name:"New pla
 
 8. For updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object):
 
-	`"inverse": {
-	  "command": "$set",
-	  "data": [
-		{
-		  "key": "text",
-		  "value": "My old post text"
+		"inverse": {
+		  "command": "$set",
+		  "data": [
+			{
+			  "key": "text",
+			  "value": "My old post text"
+			}
+		  ]
 		}
-	  ]
-	}`
 
 9. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the method code and your database, unless you do some other permission checking within the method before executing a transaction.
 
@@ -154,11 +154,11 @@ _Note: the options can also be passed as follows: `Players.insert({name:"New pla
 
 11. The default setting is `tx.softDelete=false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This can default can be changed at run time by setting `tx.softDelete=true`. Or, for finer grained management, the `softDelete=true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted:<unix timestamp>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete=true` and dealing with the pain.
 
-__Note:__ When doing a remove on the client using a transaction with `softDelete` set to `false`, only the __published__ fields of the document are stored for retrieval.  So if a document with only some of its fields published is removed on the client and then that is undone, there will be data loss (the unpublished fields will be gone from the db) which could cause your app to break or behave strangely, depending on how those fields were used.  To prevent this, there are three options:
+	__Note:__ When doing a remove on the client using a transaction with `softDelete` set to `false`, only the _published_ fields of the document are stored for retrieval.  So if a document with only some of its fields published is removed on the client and then that is undone, there will be data loss (the unpublished fields will be gone from the db) which could cause your app to break or behave strangely, depending on how those fields were used.  To prevent this, there are three options:
 
--	use `softDelete:true` (then you'll have to change your selectors in `find` and `findOne` everywhere to include `,deleted:{$exists:false}`)
--	publish the whole document to the client
--	__[best option]__ use a method call and put the remove transaction call in that, so it executes server-side where it has access to the whole document
+	-	use `softDelete:true` (then you'll have to change your selectors in `find` and `findOne` everywhere to include `,deleted:{$exists:false}`)
+	-	publish the whole document to the client
+	-	_[best option]_ use a method call and put the remove transaction call in that, so it executes server-side where it has access to the whole document
 
 12. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
 
@@ -180,7 +180,7 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 ~~0.4.5 Add support for `simple-schema`~~
 
-~~0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API~~
+~~0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API~~
 
 ~~0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
 

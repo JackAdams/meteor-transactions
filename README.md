@@ -13,7 +13,7 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
-You can make writes using either of the (equivalent) syntax styles shown below to make them undo/redo-able:
+You can make writes (note that `upsert` is not supported) using either of the (equivalent) syntax styles shown below to make the writes undo/redo-able:
 
 Instead of
 
@@ -51,7 +51,7 @@ write
 	
 	tx.remove(Posts,post_id);
 
-Note for the second syntax style: instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
+__Note for the second syntax style:__ instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
 _We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the babrahams:transactions package. The second syntax is really just to support older apps and packages that rely on it._
 
@@ -74,7 +74,7 @@ The examples above will automatically start a transaction and automatically comm
 If you want a transaction that encompasses actions on several documents, you need to explictly start and commit the transaction:
 
 	tx.start("delete post");
-	tx.remove(Posts,post_id); // or Posts.remove({_id:post_id},{tx:true});
+	tx.remove(Posts,post_id); // Posts.remove({_id:post_id},{tx:true});
 	Comments.find({post_id:post_id}).forEach(function(comment) {
 	  tx.remove(Comments,comment); // comment._id would work equally well as the second argument
 	});
@@ -132,7 +132,7 @@ _Note: the options can also be passed as follows: `Players.insert({name:"New pla
 
 5. For single actions that auto-commit, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as the parameter after the options parameter. In rare situation you might find you need to pass your callback function explicitly as `callback` in the options hash. E.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. Note that callbacks are __not__ fired on every action in a `tx.start() ... tx.commit()` block. In this scenario, a single callback can be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err,res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` if the transaction was unsuccessful; `res` takes a value of `true` if the transaction was successful and will be falsey if the transaction was rolled back; `this` is an object of the form `{transaction_id:<transaction_id>,writes:<an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
-6. Another option is `overridePermissionCheck`: `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 8.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check if you're going to `overridePermissionCheck` from a Meteor method.
+6. Another option is `overridePermissionCheck`: `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 9.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck` from a Meteor method.
 
 7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context:{}`, but you can overwrite `tx.makeContext = function(action,collection,doc,modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context:{ <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context:{}}` for the subsequent actions. 
 
@@ -150,13 +150,21 @@ _Note: the options can also be passed as follows: `Players.insert({name:"New pla
 
 9. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the method code and your database, unless you do some other permission checking within the method before executing a transaction.
 
-10. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or deleted via a transaction. `deleted:<unix timestamp>` is added to any removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself.
+10. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or soft-deleted via a transaction. This package takes care of updating your schema to allow for this if you are using the `aldeed:collection2` package.
 
-11. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
+11. The default setting is `tx.softDelete=false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This can default can be changed at run time by setting `tx.softDelete=true`. Or, for finer grained management, the `softDelete=true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted:<unix timestamp>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete=true` and dealing with the pain.
 
-12. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
+__Note:__ When doing a remove on the client using a transaction with `softDelete` set to `false`, only the __published__ fields of the document are stored for retrieval.  So if a document with only some of its fields published is removed on the client and then that is undone, there will be data loss (the unpublished fields will be gone from the db) which could cause your app to break or behave strangely, depending on how those fields were used.  To prevent this, there are three options:
 
-13. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of these so far (see below).
+-	use `softDelete:true` (then you'll have to change your selectors in `find` and `findOne` everywhere to include `,deleted:{$exists:false}`)
+-	publish the whole document to the client
+-	__[best option]__ use a method call and put the remove transaction call in that, so it executes server-side where it has access to the whole document
+
+12. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
+
+13. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
+
+14. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of these so far (see below).
 
 #### In production? Really?
 
@@ -174,9 +182,9 @@ The production app is [Standbench](http://www.standbench.com), which provides el
 
 ~~0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create a less all-or-nothing API~~
 
-0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead) 
+~~0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
 
-0.7 Add/improve support for other/existing mongo operators
+0.7 Add/improve support for other/existing mongo operators and (maybe) change the non-standard way the undo redo stacks interplay to a more familiar paradigm for users
 
 0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly  
 
@@ -188,4 +196,4 @@ _1.0+ Operational Transform_
 
 _1.0+ Look into support for {multi:true}_
 
-As you can see from the roadmap, there are still a lot of things missing from this package. I currently use it in a production app, but it's very much a case of use at your own risk.
+As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of use at your own risk right now.

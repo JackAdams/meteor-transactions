@@ -15,21 +15,41 @@ The package exposes an object called `tx` which has all the methods you need get
 
 You can make writes using either of the (equivalent) syntax styles shown below to make them undo/redo-able:
 
-Instead of 
+Instead of
 
-	`Posts.insert({text:"My post"});` 
+	Posts.insert({text:"My post"});
 
 write:
-	
-	`Posts.insert({text:"My post"},{tx:true});` 
-	
+
+	Posts.insert({text:"My post"},{tx:true});
+
 or (the equivalent)
 
-	`tx.insert(Posts,{text:"My post"});`
+	tx.insert(Posts,{text:"My post"});
 	
-Instead of Posts.update({_id:post_id},{$set:{text:"My improved post"}});` write `Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});` or `tx.update(Posts,post_id,{$set:{text:"My improved post"}});`
+Instead of
 
-Instead of `Posts.remove({_id:post_id});` write `Posts.remove({_id:post_id},{tx:true});` or `tx.remove(Posts,post_id);`
+	Posts.update({_id:post_id},{$set:{text:"My improved post"}});
+
+write
+
+	Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});
+
+or
+
+tx.update(Posts,post_id,{$set:{text:"My improved post"}});
+
+Instead of
+
+	Posts.remove({_id:post_id});
+
+write
+
+	Posts.remove({_id:post_id},{tx:true});
+
+or
+
+	tx.remove(Posts,post_id);
 
 Note for the second syntax style: instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 

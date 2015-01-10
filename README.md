@@ -13,7 +13,7 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
 
-You can make writes (note that `upsert` is not supported) using either of the (equivalent) syntax styles shown below to make the writes undo/redo-able:
+You can make writes using either of the syntax styles shown below to make them undo/redo-able (note that `upsert` is not supported):
 
 Instead of:
 
@@ -33,7 +33,7 @@ Instead of:
 
 write: `Posts.remove({_id:post_id},{tx:true});` OR `tx.remove(Posts,post_id);`
 
-__Note for the second syntax style:__ instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
+__Note about the second syntax style:__ instead of the `post_id`, you can just throw in the whole `post` document. e.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
 _We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the `babrahams:transactions` package. The second syntax is really just to support older apps and packages that rely on it._
 
@@ -56,9 +56,9 @@ The examples above will automatically start a transaction and automatically comm
 If you want a transaction that encompasses actions on several documents, you need to explictly start and commit the transaction:
 
 	tx.start("delete post");
-	tx.remove(Posts,post_id); // Posts.remove({_id:post_id},{tx:true});
+	Posts.remove({_id:post_id},{tx:true});
 	Comments.find({post_id:post_id}).forEach(function(comment) {
-	  tx.remove(Comments,comment); // comment._id would work equally well as the second argument
+	  Comments.remove({_id:comment._id},{tx:true});
 	});
 	tx.commit();
 
@@ -110,9 +110,9 @@ Now this post can be restored, along with all its comments, with one click of th
 		});
 		tx.commit();
 
-	_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as a option hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
+	_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as an option hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
 
-5. For single actions that auto-commit, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as the parameter after the options parameter. In rare situation you might find you need to pass your callback function explicitly as `callback` in the options hash. E.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. Note that callbacks are __not__ fired on every action in a `tx.start() ... tx.commit()` block. In this scenario, a single callback can be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err,res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` if the transaction was unsuccessful; `res` takes a value of `true` if the transaction was successful and will be falsey if the transaction was rolled back; `this` is an object of the form `{transaction_id:<transaction_id>,writes:<an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
+5. For single actions that auto-commit, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as the parameter after the options hash. In rare situations you might find you need to pass your callback function explicitly as `callback` in the options hash. e.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. Note that callbacks are __not__ fired on every action in a `tx.start() ... tx.commit()` block. In this scenario, a single callback can be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err,res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` if the transaction was unsuccessful; `res` takes the value(s) of the new _id for transactions that contain insert operations (string or array of strings), or `true` for transactions comprising only updates and removes if the transaction was successful; `res` will be `false` if the transaction was rolled back; in the callback, `this` is an object of the form `{transaction_id:<transaction_id>,writes:<an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
 6. Another option is `overridePermissionCheck`: `tx.remove(Posts,post,{overridePermissionCheck:true});`. This is only useful on a server-side method call (see 9.) and can be used when your `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck` from a Meteor method.
 
@@ -134,7 +134,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 10. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or soft-deleted via a transaction. This package takes care of updating your schema to allow for this if you are using the `aldeed:collection2` package.
 
-11. The default setting is `tx.softDelete = false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This can default can be changed at run time by setting `tx.softDelete = true`. Or, for finer grained management, the `softDelete:true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted:<unix timestamp>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete=true` and dealing with the pain.
+11. The default setting is `tx.softDelete = false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This can default can be changed at run time by setting `tx.softDelete = true`. Or, for finer grained management, the `softDelete:true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted:<unix timestamp>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted:{$exists:false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete = true` and dealing with the pain.
 
 	__Note:__ When doing a remove on the client using a transaction with `softDelete` set to `false`, only the _published_ fields of the document are stored for retrieval.  So if a document with only some of its fields published is removed on the client and then that is undone, there will be data loss (the unpublished fields will be gone from the db) which could cause your app to break or behave strangely, depending on how those fields were used.  To prevent this, there are three options:
 

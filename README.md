@@ -15,45 +15,27 @@ The package exposes an object called `tx` which has all the methods you need get
 
 You can make writes (note that `upsert` is not supported) using either of the (equivalent) syntax styles shown below to make the writes undo/redo-able:
 
-Instead of
+Instead of:
 
 	Posts.insert({text:"My post"});
 
-write:
-
-	Posts.insert({text:"My post"},{tx:true});
+write: `Posts.insert({text:"My post"},{tx:true});` OR `tx.insert(Posts,{text:"My post"});`
 	
-	// OR
-	
-	tx.insert(Posts,{text:"My post"});
-	
-Instead of
+Instead of:
 
 	Posts.update({_id:post_id},{$set:{text:"My improved post"}});
 
-write
+write: `Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});` OR `tx.update(Posts,post_id,{$set:{text:"My improved post"}});`
 
-	Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});
-	
-	// OR
-	
-	tx.update(Posts,post_id,{$set:{text:"My improved post"}});
-
-Instead of
+Instead of:
 
 	Posts.remove({_id:post_id});
 
-write
-
-	Posts.remove({_id:post_id},{tx:true});
-	
-	// OR
-	
-	tx.remove(Posts,post_id);
+write: `Posts.remove({_id:post_id},{tx:true});` OR `tx.remove(Posts,post_id);`
 
 __Note for the second syntax style:__ instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
-_We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the babrahams:transactions package. The second syntax is really just to support older apps and packages that rely on it._
+_We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the `babrahams:transactions` package. The second syntax is really just to support older apps and packages that rely on it._
 
 The last thing you'll need to do is include the undo/redo buttons widget in a template:
 
@@ -89,17 +71,17 @@ Now this post can be restored, along with all its comments, with one click of th
 
 1. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows:
 
-	tx.log = function(message) { 
-	  // Your own logging logic here
-	}
+		tx.log = function(message) { 
+		  // Your own logging logic here
+		}
 
 2. To run all actions through your own custom permission check, write a function as follows:
 
-	tx.checkPermission = function(action,collection,doc,modifier) {
-	  // Your permission check logic here
-	};
+		tx.checkPermission = function(action,collection,doc,modifier) {
+		  // Your permission check logic here
+		};
 	
-The parameters your function receives are as follows: `action` will be a string - either "insert", "update" or "remove", `collection` will be the actual Meteor collection instance - you can query it if you need to, `doc` will be the document in question, and `modifier` will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions). If your `tx.checkPermission` function returns a falsey value, the current transaction will be cancelled and rolled back.
+	The parameters your function receives are as follows: `action` will be a string - either "insert", "update" or "remove", `collection` will be the actual Meteor collection instance - you can query it if you need to, `doc` will be the document in question, and `modifier` will be the modifier used for an update action (this will be `null` for "insert" or "remove" actions). If your `tx.checkPermission` function returns a falsey value, the current transaction will be cancelled and rolled back.
 
 3. The end user only gets (by default) the set of transactions they made from 5 minutes before their last browser refresh. All transactions persist until the next browser refresh, so if a user last refreshed their browser 40 minutes ago, they'll have 45 minutes worth of transactions in their client-side stack. This time can be changed by setting `tx.undoTimeLimit = <number of seconds>`.
 

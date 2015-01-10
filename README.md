@@ -22,9 +22,7 @@ Instead of
 write:
 
 	Posts.insert({text:"My post"},{tx:true});
-
-or (the equivalent)
-
+	// or
 	tx.insert(Posts,{text:"My post"});
 	
 Instead of
@@ -34,10 +32,8 @@ Instead of
 write
 
 	Posts.update({_id:post_id},{$set:{text:"My improved post"}},{tx:true});
-
-or
-
-tx.update(Posts,post_id,{$set:{text:"My improved post"}});
+	// or
+	tx.update(Posts,post_id,{$set:{text:"My improved post"}});
 
 Instead of
 
@@ -46,9 +42,7 @@ Instead of
 write
 
 	Posts.remove({_id:post_id},{tx:true});
-
-or
-
+	// or
 	tx.remove(Posts,post_id);
 
 Note for the second syntax style: instead of the `post_id`, you can just throw in the whole `post` document. E.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`

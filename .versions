@@ -1,12 +1,12 @@
 application-configuration@1.0.4
-babrahams:transactions@0.6.0
+babrahams:transactions@0.6.1
 base64@1.0.2
 binary-heap@1.0.2
 blaze@2.0.4
 blaze-tools@1.0.2
 callback-hook@1.0.2
 check@1.0.3
-dburles:mongo-collection-instances@0.2.5
+dburles:mongo-collection-instances@0.2.6
 ddp@1.0.13
 deps@1.0.6
 ejson@1.0.5

@@ -166,9 +166,9 @@ The production app is [Standbench](http://www.standbench.com), which provides on
 
 ~~0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
 
-0.7 Add/improve support for other/existing mongo operators and (maybe) change the non-standard way the undo redo stacks interplay to a more familiar paradigm for users
+0.7 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly (see issue #5)
 
-0.8 Implement [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) properly  
+0.8 Add/improve support for other/existing mongo operators and (maybe) change the non-standard way the undo redo stacks interplay to a more familiar paradigm for users
 
 0.9 Tests  
 

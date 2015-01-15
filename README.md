@@ -180,4 +180,4 @@ _1.0+ Operational Transform_
 
 _1.0+ Look into support for {multi:true}_
 
-As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of use at your own risk right now.
+As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of _use-at-your-own-risk_ right now.

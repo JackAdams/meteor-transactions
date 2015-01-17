@@ -35,7 +35,7 @@ write: `Posts.remove({_id:post_id},{tx:true});` OR `tx.remove(Posts,post_id);`
 
 __Note about the second syntax style:__ instead of the `post_id`, you can just throw in the whole `post` document. e.g. `tx.remove(Posts,post)` where `post = {_id:"asjkhd2kg92nsglk2g",text:"My lame post"}`
 
-_We recommend using the first syntax style, as that won't require any refactoring of your app if you remove the `babrahams:transactions` package. The second syntax is really just to support older apps and packages that rely on it._
+_We recommend using the first syntax style, as that won't require as much refactoring of your app if you remove the `babrahams:transactions` package (just a global find and replace of `,{tx:true}` as the native `insert` and `remove` methods don't accept an options hash). The second syntax is really just to support older apps and packages that rely on it._
 
 The last thing you'll need to do is include the undo/redo buttons widget in a template:
 
@@ -149,6 +149,8 @@ Now this post can be restored, along with all its comments, with one click of th
 13. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
 
 14. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of these so far (see below).
+
+15. There is rudimentary support for the popular `aldeed:collection2` package, provided `babrahams:transactions` appears _after_ `aldeed:collection2` in the `.packages` file.  This is a pretty volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash before passing the call on to the native functions (while still passing on any callbacks to match the behaviour in the Meteor docs).  If you try to set `validationContext` for `aldeed:collection2` while using `babrahams:transactions`, something is guaranteed to break.  A fix will be rolled out someday, but probably not anytime soon.
 
 #### In production? Really?
 

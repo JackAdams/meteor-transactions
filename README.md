@@ -150,7 +150,9 @@ Now this post can be restored, along with all its comments, with one click of th
 
 14. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of these so far (see below).
 
-15. There is rudimentary support for the popular `aldeed:collection2` package, provided `babrahams:transactions` appears _after_ `aldeed:collection2` in the `.packages` file.  This is a pretty volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash before passing the call on to the native functions (while still passing on any callbacks to match the behaviour in the Meteor docs).  If you try to set `validationContext` for `aldeed:collection2` while using `babrahams:transactions`, something is guaranteed to break.  A fix will be rolled out someday, but probably not anytime soon.
+15. There is rudimentary support for the popular `aldeed:collection2` package, provided `babrahams:transactions` appears __after__ `aldeed:collection2` in the `.packages` file.  This is a pretty volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash* before passing the call on to the native functions (while still allowing on any callbacks to match the behaviour in the Meteor docs).  Open an issue if this package doesn't seem to work with `aldeed:collection2`.
+
+* although `babrahams:transactions` does allow the `aldeed:collection2` options through if it detects the presence of that package
 
 #### In production? Really?
 

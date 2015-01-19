@@ -152,7 +152,7 @@ Now this post can be restored, along with all its comments, with one click of th
 
 15. There is rudimentary support for the popular `aldeed:collection2` package, provided `babrahams:transactions` appears __after__ `aldeed:collection2` in the `.packages` file.  This is a pretty volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash* before passing the call on to the native functions (while still allowing on any callbacks to match the behaviour in the Meteor docs).  Open an issue if this package doesn't seem to work with `aldeed:collection2`.
 
-\* although `babrahams:transactions` does allow the `aldeed:collection2` options through if it detects the presence of that package
+    \* although `babrahams:transactions` does allow the `aldeed:collection2` options through if it detects the presence of that package
 
 #### In production? Really?
 

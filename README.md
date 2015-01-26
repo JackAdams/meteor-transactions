@@ -110,7 +110,7 @@ Now this post can be restored, along with all its comments, with one click of th
 		});
 		tx.commit();
 
-	_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as an option hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
+	_Note: the options can also be passed as follows: `Players.insert({name:"New player"},{tx:{instant:true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as an options hash is passed as the value for `tx` (instead of `true`), the transaction method won't consider any other options except those in that hash._
 
 5. a. For single actions within a transaction, you can pass a callback function instead of the options hash or, if you want some options _and_ a callback, as the parameter after the options hash. In rare situations you might find you need to pass your callback function explicitly as `callback` in the options hash. e.g. `tx.remove(Posts,post,{instant:true,callback:function(err,res) { console.log(this,err,res)}});`. __Note:__ if the callback functions fired on individual actions (in either a single-action, auto-committed transaction or a `tx.start() ... tx.commit()` block) make changes to collections, these will __NOT__ be undoable as part of the transaction.
 

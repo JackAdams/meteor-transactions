@@ -1,5 +1,5 @@
 #undo-redo {
-  display: inline-block;	
+  display: inline-block;    
 }
 
 #undo-redo .hide-undo-button, #undo-redo .hide-redo-button {

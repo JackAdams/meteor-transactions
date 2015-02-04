@@ -19,7 +19,7 @@ Package.onUse(function (api, where) {
   api.use('accounts-base');
   api.imply('mongo');
   api.use('dburles:mongo-collection-instances@0.2.6');
-  api.use('aldeed:collection2', ['client','server'], {weak:true});
+  api.use('aldeed:collection2@2.3.2', ['client','server'], {weak:true});
 
   api.add_files('lib/transactions_client.html', 'client');
   api.add_files('lib/transactions_client.js', 'client');

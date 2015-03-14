@@ -144,7 +144,7 @@ Now this post can be restored, along with all its comments, with one click of th
 	-	publish the whole document to the client
 	-	_[best option]_ use a method call and put the remove transaction call in that, so it executes server-side where it has access to the whole document
 
-12. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
+12. This is all "last write wins". No Operational Transform going on here. If a document has been modified by a different transaction than the one you are trying to undo, the undo will be cancelled (and the user notified via a callback -- which, by default, is an alert -- you can overwrite this with your own function using `tx.onTransactionExpired = function() { ... }` -- or switch it off using `tx.onTransactionExpired = null;`). If users are simultaneously writing to the same sets of documents via transactions, a scenario could potentially arise in which neither user was able to undo their last transaction. This package will not work well for multiple writes to the same document by different users - e.g. Etherpad type apps.
 
 13. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo`.
 
@@ -153,6 +153,13 @@ Now this post can be restored, along with all its comments, with one click of th
 15. There is rudimentary support for the popular `aldeed:collection2` package, provided `babrahams:transactions` appears __after__ `aldeed:collection2` in the `.packages` file.  This is a pretty volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash* before passing the call on to the native functions (while still allowing any callbacks to fire, to match the behaviour specified in the Meteor docs).  Open an issue if this package doesn't seem to work with `aldeed:collection2`.
 
     \* although `babrahams:transactions` does allow the `aldeed:collection2` options through if it detects the presence of that package
+
+16. When starting a transaction, you can write `var txid = tx.start('add post');` and then target this particular transaction for undo/redo using `tx.undo(txid)`. You can also pass a callback instead of (or in addition to) a txid value, as follows:
+
+        tx.undo(function (err, res) {
+          // `res` with be true if the transaction was undone or false if it is an expired transaction
+	      // `this` will be the tx object 
+        }
 
 #### In production? Really?
 

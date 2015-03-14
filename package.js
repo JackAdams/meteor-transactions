@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "Undo/Redo stack based on transactions",
-  version: "0.6.15",
+  version: "0.6.16",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 
@@ -18,7 +18,7 @@ Package.onUse(function (api, where) {
   api.use('mongo');
   api.use('accounts-base');
   api.imply('mongo');
-  api.use('dburles:mongo-collection-instances@0.2.6');
+  api.use('dburles:mongo-collection-instances@0.3.3');
   api.use('aldeed:collection2@2.3.2', ['client','server'], {weak:true});
 
   api.add_files('lib/transactions_client.html', 'client');

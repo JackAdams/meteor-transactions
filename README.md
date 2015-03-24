@@ -132,30 +132,27 @@ Now this post can be restored, along with all its comments, with one click of th
 		  ]
 		}
 
-If you want to override the default inverse operation for a specific update operation, you can supply your own function in the `tx.inverseOperations` hash.  For example, if you wanted to restore the entire current state of an array field after a `$push` or `$addToSet` operation, you could implement it like this:
+	If you want to override the default inverse operation for a specific update operation, you can supply your own function in the `tx.inverseOperations` hash.  For example, if you wanted to restore the entire current state of an array field after a `$push` or `$addToSet` operation, you could implement it like this:
 
-```javascript
-tx.inverseOperations.$addToSet = function (collection, existingDoc, updateMap, opt) {
-  // Function to use $set or $unset to restore original state of updated fields
-  var self = this, inverseCommand = '$set', formerValues = {};
-  // Brute force approach to ensure previous array is restored on undo
-  // even if $addToSet uses sub-modifiers like $each / $slice
-  // console.log('existingDoc:'+JSON.stringify(existingDoc));
-  _.each(_.keys(updateMap), function (keyName) {
-    var formerVal = self._drillDown(existingDoc,keyName);
-     if (typeof formerVal !== 'undefined') {
-      formerValues[keyName] = formerVal;
-     } else {
-      // Reset to empty array. Really should be an $unset but cannot mix inverse actions
-      formerValues[keyName] = [];
-     }
-  })
-  return {command:inverseCommand,data:formerValues};
-};
+		tx.inverseOperations.$addToSet = function (collection, existingDoc, updateMap, opt) {
+		  // Function to use $set or $unset to restore original state of updated fields
+		  var self = this, inverseCommand = '$set', formerValues = {};
+		  // Brute force approach to ensure previous array is restored on undo
+		  // even if $addToSet uses sub-modifiers like $each / $slice
+		  // console.log('existingDoc:'+JSON.stringify(existingDoc));
+		  _.each(_.keys(updateMap), function (keyName) {
+		    var formerVal = self._drillDown(existingDoc,keyName);
+		     if (typeof formerVal !== 'undefined') {
+		      formerValues[keyName] = formerVal;
+		     } else {
+		      // Reset to empty array. Really should be an $unset but cannot mix inverse actions
+		      formerValues[keyName] = [];
+		     }
+		  })
+		  return {command:inverseCommand,data:formerValues};
+		};
 
-```
-
-Note that supplying a `inverse` options property in an individual update always takes precedence over the functions in `tx.inverseOperations`. 
+	Note that supplying a `inverse` options property in an individual update always takes precedence over the functions in `tx.inverseOperations`. 
 
 9. The transaction queue is either processed entirely on the client or entirely on the server.  You can't mix client-side calls and server-side calls (i.e. Meteor methods) in a single transaction. If the transaction is processed on the client, then a successfully processed queue will be sent to the server via DDP as a bunch of regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. If the transaction is processed entirely on the server (i.e. in a Meteor method call), the `tx.permissionCheck` function is all that stands between the method code and your database, unless you do some other permission checking within the method before executing a transaction.
 

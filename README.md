@@ -11,7 +11,7 @@ Repo for the example app is [here](https://github.com/JackAdams/transactions-exa
 
 	meteor add babrahams:transactions
 
-The package exposes an object called `tx` which has all the methods you need get an undo/redo stack going.
+The package exposes an object called `tx` which has all the methods you need to get an undo/redo stack going.
 
 You can make writes using either of the syntax styles shown below to make them undo/redo-able (note that `upsert` is not supported):
 

@@ -36,7 +36,7 @@ Jasmine.onTest(function() {
         },
         {
           tx: true, instant: true
-		  // remove the `instant: true` to test whether the correct inverse value used during the commit phase
+		  // remove the `instant: true` to test whether the correct inverse value was used during the commit phase
 		  // NOTE: in the current implementation, this fails - to fix would require a substantial rewrite
         });
 	  fooCollection.update(

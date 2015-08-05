@@ -1,13 +1,13 @@
 App Level Transactions for Meteor + Mongo
 -----------------------------------------
 
-This package is used to simulate transactions (at the application level) for Mongo. It is a more robust version of the `babrahams:transactions` package (with the same API).
+This package is used to simulate transactions (at the application level) for Mongo.
 
 Although this package aims to improve the overall data integrity of your app, __do not__ use it to write banking applications or anything like that.
 
-Note: because this package attempts to implement something similar to a [mongo 2-phase commit](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/), it makes twice the number of db writes as the more naive implementation of "transactions" in `babrahams:transactions@0.6.21`.
+Note: because this package attempts to implement something similar to a [mongo 2-phase commit](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/), it makes twice the number of db writes as the more naive implementation in `babrahams:transactions@0.6.21`.
 
-A "transaction" can be a single action (insert, update or remove) on a single document, or a set of different actions across different documents.
+A transaction can be a single action (insert, update or remove) on a single document, or a set of different actions across different documents.
 
 An example app is up at [http://transactions.meteor.com/](http://transactions.meteor.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
 
@@ -36,7 +36,7 @@ An example app is up at [http://transactions.meteor.com/](http://transactions.me
 	meteor remove babrahams:transactions
 	```
 
-	This removes this packages as a top-level dependency and keeps it out of your `meteor list` results. This could be achieved more quickly by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
+	This removes this package as a top-level dependency and keeps it out of your `meteor list` results. This could be achieved more quickly by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
 
 3. The API is unchanged.
 

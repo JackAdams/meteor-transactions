@@ -6,5 +6,7 @@
 
 meteor-platform
 sanjo:jasmine
+babrahams:undo-redo
+constellation:velocity
 velocity:html-reporter
-babrahams:transactions
+babrahams:constellation

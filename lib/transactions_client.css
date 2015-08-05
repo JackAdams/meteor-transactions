@@ -1,7 +1,0 @@
-#undo-redo {
-  display: inline-block;    
-}
-
-#undo-redo .hide-undo-button, #undo-redo .hide-redo-button {
-  display: none;
-}

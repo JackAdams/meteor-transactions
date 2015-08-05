@@ -29,7 +29,7 @@ describe('state after hardware failure', function () {
 
     // Now we make a couple of changes to the db to simulate failure after the insert
     // but before the update
-    // The state of the `foo` field should still be "initial"
+    // The state of the `state` field should still be "initial"
     // and there should be no transaction_id set
     // and the transaction state should still be "pending"
     // the state on the action that hasn't been completed should also be "pending", not "done"

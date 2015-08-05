@@ -24,7 +24,9 @@ An example app is up at [http://transactions.meteor.com/](http://transactions.me
 
 2. This package no longer contains the undo-redo UI widget - it can be added as a separate package using:
 
+	```
 	meteor add babrahams:undo-redo
+	```
 
 	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed below) will be exposed.
 
@@ -111,13 +113,13 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 #### What does it do?
 
-**It's important to understand the following points before deciding whether transactions will be the right package for your app:**
+**It's important to understand the following points before deciding whether `babrahams:transactions` will be the right package for your app:**
 
 1. It creates a collection called `transactions` in mongodb. The Meteor collection for this is exposed via `tx.Transactions` not just as plain `Transactions`.
 
-2. It queues all the actions you've called in a single `tx.start() ... tx.commit()` block, doing permission checks as it goes. If a forbidden action (i.e. where tx.checkPermission returns false) is added to the queue, it will not execute any of the actions previously queued. It will clear the queue and wait for the next transaction to begin. This queue is created by monkey-patching the `insert`, `update` and `remove` methods of `Mongo.Collection` instances so that these db mutator calls are intercepted and not executed until this package has done its thing (much like `aldeed:collection2`). And, yes, this need for monkey-patching is unfortunate, but it [has to be addressed in Meteor core](https://github.com/meteor/meteor/issues/395).
+2. It queues all the actions you've called in a single `tx.start() ... tx.commit()` block, doing permission checks as it goes. If a forbidden action (i.e. where `tx.checkPermission` returns `false`) is added to the queue, it will not execute any of the actions previously queued. It will clear the queue and wait for the next transaction to begin. This queue is created by monkey-patching the `insert`, `update` and `remove` methods of `Mongo.Collection` instances so that these db mutator calls are intercepted and not executed until this package has done its thing (much like `aldeed:collection2`). And, yes, this need for monkey-patching is unfortunate, but it [has to be addressed in Meteor core](https://github.com/meteor/meteor/issues/395).
 
-3. Once permission checking is complete, it executes the actions in the order they were queued (this is important, see 4.). If an error is caught, it will roll back all actions that have been executed so far and will not execute any further actions. The queue will be cleared and it will wait for the next transaction.
+3. Once permission checking is complete, it executes the actions in the order they were queued. If an error is caught, it will roll back all actions that have been executed so far and will not execute any further actions. The queue will be cleared and it will wait for the next transaction.
 
 4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).  For example, in a RPG where a new player gets a few items by default:
 
@@ -227,16 +229,16 @@ The production app is [Standbench](http://www.standbench.com), which provides on
 
 #### Roadmap
 
-[x] 0.3 Add callbacks to `tx.commit()`
-[x] 0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package
-[x] 0.4.5 Add support for `simple-schema`
-[x] 0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API
-[x] 0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)
-[x] 0.7 Implement something like [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) (see [issue #5](https://github.com/JackAdams/meteor-transactions/issues/5)) and factor out undo/redo UI to a separate package
-[ ] 0.8 Add more test coverage and refactor code for better maintainability
-[ ] 0.9 Add/improve support for other/existing mongo operators  
-[ ] 1.0 Complete test coverage and security audit  
-[ ] _1.0+ Operational Transform_
-[ ] _1.0+ Look into support for {multi:true}_
+* [x] 0.3 Add callbacks to `tx.commit()`
+* [x] 0.4 Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package
+* [x] 0.4.5 Add support for `simple-schema`
+* [x] 0.5 Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API
+* [x] 0.6 Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)
+* [x] 0.7 Implement something like [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) (see [issue #5](https://github.com/JackAdams/meteor-transactions/issues/5)) and factor out undo/redo UI to a separate package
+* [ ] 0.8 Add more test coverage and refactor code for better maintainability
+* [ ] 0.9 Add/improve support for other/existing mongo operators  
+* [ ] 1.0 Complete test coverage and security audit  
+* [ ] _1.0+ Operational Transform_
+* [ ] _1.0+ Look into support for {multi:true}_
 
 As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of _use-at-your-own-risk_ right now.

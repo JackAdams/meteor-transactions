@@ -229,16 +229,16 @@ The production app is [Standbench](http://www.standbench.com), which provides on
 
 #### Roadmap
 
-* [x] __0.3__ ~~Add callbacks to `tx.commit()`~~
-* [x] __0.4__ ~~Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package~~
-* [x] __0.4.5__ ~~Add support for `simple-schema`~~
-* [x] __0.5__ ~~Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API~~
-* [x] __0.6__ ~~Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
-* [x] __0.7__ ~~Implement something like [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) (see [issue #5](https://github.com/JackAdams/meteor-transactions/issues/5)) and factor out undo/redo UI to a separate package~~
-* [ ] __0.8__ Add more test coverage and refactor code for better maintainability
-* [ ] __0.9__ Add/improve support for other/existing mongo operators  
-* [ ] __1.0__ Complete test coverage and security audit  
-* [ ] ___1.0+__ Operational Transform_
-* [ ] ___1.0+__ Look into support for {multi:true}_
+* [x] __0.3__ - ~~Add callbacks to `tx.commit()`~~
+* [x] __0.4__ -~~Remove the need for `tx.collectionIndex`, using `dburles:mongo-collection-instances` package~~
+* [x] __0.4.5__ - ~~Add support for `simple-schema`~~
+* [x] __0.5__ - ~~Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API~~
+* [x] __0.6__ - ~~Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
+* [x] __0.7__ - ~~Implement something like [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) (see [issue #5](https://github.com/JackAdams/meteor-transactions/issues/5)) and factor out undo/redo UI to a separate package~~
+* [ ] __0.8__ - Add more test coverage and refactor code for better maintainability
+* [ ] __0.9__ - Add/improve support for other/existing mongo operators  
+* [ ] __1.0__ - Complete test coverage and security audit  
+* [ ] __1.0+__ - _Operational Transform_
+* [ ] __1.0+__ - _Look into support for {multi:true}_
 
 As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of _use-at-your-own-risk_ right now.

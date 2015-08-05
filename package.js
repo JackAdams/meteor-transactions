@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
-  summary: "Undo/Redo stack based on transactions",
-  version: "0.7.0",
+  summary: "App level transactions for Meteor + Mongo",
+  version: "0.7.1",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 

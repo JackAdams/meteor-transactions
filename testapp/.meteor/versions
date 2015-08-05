@@ -5,8 +5,7 @@ autoupdate@1.2.1
 babrahams:constellation@0.1.3
 babrahams:editable-json@0.6.0
 babrahams:temple@0.3.1
-babrahams:transactions@0.7.0
-babrahams:undo-redo@0.1.0
+babrahams:transactions@0.7.1
 base64@1.0.3
 binary-heap@1.0.3
 blaze@2.1.2

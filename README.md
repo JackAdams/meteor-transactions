@@ -26,15 +26,15 @@ An example app is up at [http://transactions.meteor.com/](http://transactions.me
 
 	meteor add babrahams:undo-redo
 
-If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed below) will be exposed.
+	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed below) will be exposed.
 
-You are therefore free to:
-
+	You are therefore free to:
+	
+	```
 	meteor remove babrahams:transactions
+	```
 
-This removes this packages as a top-level dependency and keeps it out of your `meteor list` results.
-
-This could be achieved even faster by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
+	This removes this packages as a top-level dependency and keeps it out of your `meteor list` results. This could be achieved more quickly by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
 
 3. The API is unchanged.
 

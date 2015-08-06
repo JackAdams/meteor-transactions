@@ -51,7 +51,7 @@ describe('updates with $pull', function () {
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
     expect(txDoc.items[0].inverse).toEqual(
-      { command: '$addToSet', data: [ { key: 'foo', value: { json: '{"bar":1}' } } ] }
+      { command: '$addToSet', data: [ { key: 'foo', json: '{"bar":1}' } ] }
       );
     
   })

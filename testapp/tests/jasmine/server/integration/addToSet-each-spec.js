@@ -51,7 +51,7 @@ describe('updates with $addToSet', function () {
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
     expect(txDoc.items[0].inverse).toEqual(
-      { command: '$pull', data: [ { key: 'foo', value: { json: '{"bar":4}' } } ] }
+      { command: '$pull', data: [ { key: 'foo', json: '{"bar":4}' } ] }
       );
     
   })
@@ -116,7 +116,7 @@ describe('updates with $addToSet', function () {
 
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
-    expect(txDoc.items[0].update).toEqual({ command: '$addToSet', data: [ { key: 'foo', value: { json: '{"$each":[{"bar":4},{"bar":5}]}' } } ] });
+    expect(txDoc.items[0].update).toEqual({ command: '$addToSet', data: [ { key: 'foo', json: '{"$each":[{"bar":4},{"bar":5}]}' } ] });
   })
 
   it ('can be updated with $addToSet modifier using $each and then undone and redone', function () {
@@ -180,8 +180,8 @@ describe('updates with $addToSet', function () {
     expect(recoveredFoo.fooBar).toEqual([{fooBar: 1}]);
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
-    expect(txDoc.items[0].update).toEqual({ command: '$addToSet', data: [ { key: 'foo', value: { json: '{"$each":[{"bar":4},{"bar":5}]}' } }, { key: 'fooBar', value: { json: '{"fooBar":1}' } } ] });
-    expect(txDoc.items[0].inverse).toEqual({ command: '$pull', data: [ { key: 'foo', value: { json: '{"$each":[{"bar":4},{"bar":5}]}' } }, { key: 'fooBar', value: { json: '{"fooBar":1}' } } ] });
+    expect(txDoc.items[0].update).toEqual({ command: '$addToSet', data: [ { key: 'foo', json: '{"$each":[{"bar":4},{"bar":5}]}' }, { key: 'fooBar', json: '{"fooBar":1}' } ] });
+    expect(txDoc.items[0].inverse).toEqual({ command: '$pull', data: [ { key: 'foo', json: '{"$each":[{"bar":4},{"bar":5}]}' }, { key: 'fooBar', json: '{"fooBar":1}' } ] });
   });
 
   describe('with brute force inverse operation', function () {
@@ -267,7 +267,7 @@ describe('updates with $addToSet', function () {
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
     expect(txDoc.items.length).toBe(2);
     expect(txDoc.items[0].inverse).toEqual(
-      { command: '$pull', data: [ { key: 'foo', value: { json: '{"bar":4}' } } ] }
+      { command: '$pull', data: [ { key: 'foo', json: '{"bar":4}' } ] }
       );
     expect(txDoc.items[1].inverse).toEqual(
       {"command":"$unset","data":[{"key":"fooBar","value":""}]}

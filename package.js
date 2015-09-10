@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "App level transactions for Meteor + Mongo",
-  version: "0.7.3",
+  version: "0.7.4",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 
@@ -14,7 +14,7 @@ Package.onUse(function (api, where) {
   api.imply('mongo');
   
   // Third party
-  api.use('aldeed:collection2@2.3.3', ['client','server'], {weak:true});
+  api.use('aldeed:collection2@2.5.0', ['client','server'], {weak:true});
   api.use('dburles:mongo-collection-instances@0.3.4');
   api.use('socialize:server-time@0.1.1');
 

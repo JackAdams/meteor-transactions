@@ -146,7 +146,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can set a custom context in a few different ways. 
 
-   ⋅You may set context multiple times within one transaction, using multiple methods. Each time you set context the properties will be added to the context you have set already (using underscore.js "extend" behind the scenes). If you set the same key more than once then **last write wins**.
+   You may set context multiple times within one transaction, using multiple methods. Each time you set context the properties will be added to the context you have set already (using underscore.js "extend" behind the scenes). If you set the same key more than once then **last write wins**.
 
    Here's how you can set context:
 

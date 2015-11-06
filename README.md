@@ -156,7 +156,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
   3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 
-  4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. 
+  4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. E.G. `Posts.update({ _id: postId}, {$set:{foo:"bar"}}, { tx: true, context:{ postAuthorName: "Jack Black" })`
 
 
 8. For individual updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object of the update call):

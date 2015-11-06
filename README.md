@@ -152,7 +152,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
   1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
 
-  2. **At Any Time During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
+  2. **Anytime During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
 
   3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 

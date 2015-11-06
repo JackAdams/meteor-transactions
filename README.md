@@ -146,17 +146,17 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can set a custom context in a few different ways. 
 
-⋅⋅⋅You may set context multiple times within one transaction, using multiple methods. Each time you set context the properties will be added to the context you have set already (using underscore.js "extend" behind the scenes). If you set the same key more than once then **last write wins**.
+   ⋅You may set context multiple times within one transaction, using multiple methods. Each time you set context the properties will be added to the context you have set already (using underscore.js "extend" behind the scenes). If you set the same key more than once then **last write wins**.
 
-Here's how you can set context:
+   Here's how you can set context:
 
-⋅⋅1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
+  1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
 
-..2. **At Any Time During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
+  2. **At Any Time During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
 
-..3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that last write wins if multiple actions happen in the same transaction. 
+  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 
-..4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. 
+  4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. 
 
 
 8. For individual updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object of the update call):

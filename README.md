@@ -144,7 +144,20 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`.
 
-7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can overwrite `tx.makeContext = function(action, collection, doc, modifier) { ... }` to record a context based on each action. If there are multiple documents being processed by a single transaction, the values from the last document in the queue will overwrite values for `context` fields that have already taken a value from a previous document - last write wins. To achieve finer-grained control over context, you can pass `{context: { <Your JSON object for context> }}` into the options parameter of the first action and then pass `{context: {}}` for the subsequent actions. 
+7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can set a custom context in a few different ways. 
+
+   You may set context multiple times within one transaction, using multiple methods. Each time you set context the properties will be added to the context you have set already (using underscore.js "extend" behind the scenes). If you set the same key more than once then **last write wins**.
+
+   Here's how you can set context:
+
+  1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
+
+  2. **Anytime During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
+
+  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
+
+  4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. E.G. `Posts.update({ _id: postId}, {$set:{foo:"bar"}}, { tx: true, context:{ postAuthorName: "Jack Black" })`
+
 
 8. For individual updates, there is an option to provide a custom inverse operation if the transactions package is not getting it right by default. This is the format that a custom inverse operation would need to take (in the options object of the update call):
 

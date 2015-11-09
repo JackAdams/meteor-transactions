@@ -3,3 +3,4 @@
  */
 
 fooCollection = new Mongo.Collection('fooCollection');
+rollbackTestCollection = new Mongo.Collection('rollbackTestCollection');

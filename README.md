@@ -115,7 +115,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 **It's important to understand the following points before deciding whether `babrahams:transactions` will be the right package for your app:**
 
-1. It creates a collection called `transactions` in mongodb. The Meteor collection for this is exposed via `tx.Transactions` not just as plain `Transactions`.
+1. It creates a collection called `transactions` in mongodb (or whatever you like, if you set `Meteor.settings.transactionsCollection` via a `settings.json` file). The Meteor collection for this is exposed via `tx.Transactions` not just as plain `Transactions`.
 
 2. It queues all the actions you've called in a single `tx.start() ... tx.commit()` block, doing permission checks as it goes. If a forbidden action (i.e. where `tx.checkPermission` returns `false`) is added to the queue, it will not execute any of the actions previously queued. It will clear the queue and wait for the next transaction to begin. This queue is created by monkey-patching the `insert`, `update` and `remove` methods of `Mongo.Collection` instances so that these db mutator calls are intercepted and not executed until this package has done its thing (much like `aldeed:collection2`). And, yes, this need for monkey-patching is unfortunate, but it [has to be addressed in Meteor core](https://github.com/meteor/meteor/issues/395).
 

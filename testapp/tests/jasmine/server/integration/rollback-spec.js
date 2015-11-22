@@ -79,7 +79,7 @@ describe('rollback after updates are made', function () {
   it ('should still work with server error', function () {
     // SETUP
     // EXECUTE
-    tx.start('update foo field then throw an error');
+    var txid = tx.start('update foo field then throw an error');
     fooCollection.update(
       {_id: insertedFooDoc._id},
       {
@@ -120,7 +120,10 @@ describe('rollback after updates are made', function () {
 	
 	tx.commit();
 	
-    // VERIFY
+	// console.log("transactionDoc:", tx.Transactions.findOne({_id: txid}));
+	// console.log("recoveredFoo:", insertedFooDoc, fooCollection.findOne({_id: insertedFooDoc._id}));
+    
+	// VERIFY
     var recoveredFoo = fooCollection.findOne(
     {_id: insertedFooDoc._id});
     expect(recoveredFoo.foo === "Transitional state").toBe(false);
@@ -128,6 +131,63 @@ describe('rollback after updates are made', function () {
     expect(recoveredFoo.foo === "Initial state").toBe(true);
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: recoveredFoo.transaction_id});
+    expect(txDoc.state).toEqual("rolledBack");
+
+  });
+  
+  it ('should restore state if a non-existent document is removed', function () {
+    // SETUP
+	
+	// First remove the doc
+    fooCollection.remove(
+      {_id: insertedFooDoc._id}
+    );
+	
+	// EXECUTE
+    var txid = tx.start('remove non-existent doc then throw an error in the same transaction');
+	
+	expect(txid).toBeDefined();
+    
+	// Then try and remove it again via a transaction
+	fooCollection.remove(
+      {_id: insertedFooDoc._id},
+      {
+        tx: true,
+		instant: true
+      }
+    );
+	
+	// Check the update was made
+	var recoveredFoo = fooCollection.findOne(
+    {_id: insertedFooDoc._id});
+	expect(recoveredFoo).toBe(undefined);
+	
+	// Throw a hard error in mongo to force a rollback
+	fooCollection.update(
+      {_id: insertedFooDoc._id},
+      {
+        $noSuchOperation: {
+          foo: "Second transitional state"
+        }
+      },
+      {
+        tx: true
+      }
+    );
+	
+	tx.commit();
+	
+	console.log("transactionDoc:", tx.Transactions.findOne({_id: txid}).items[1]);
+	// console.log("recoveredFoo:", insertedFooDoc, fooCollection.findOne({_id: insertedFooDoc._id}));
+    
+	// VERIFY
+	// Make sure the removed document doesn't end up in the database again
+    var recoveredFoo = fooCollection.findOne(
+    {_id: insertedFooDoc._id});
+    expect(recoveredFoo).toBe(undefined);
+    // Check transaction
+    var txDoc = tx.Transactions.findOne({_id: txid});
+	expect(txDoc.items.length).toBe(2);
     expect(txDoc.state).toEqual("rolledBack");
 
   });

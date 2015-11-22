@@ -35,7 +35,7 @@ describe('committed transaction documents', function () {
   });
  
   it ('should have the correct user_id', function () {;
-    
+
     expect(transactionDoc.user_id).toEqual(fakeId);
     
   });

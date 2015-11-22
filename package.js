@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "App level transactions for Meteor + Mongo",
-  version: "0.7.4",
+  version: "0.7.5",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 
@@ -10,7 +10,7 @@ Package.onUse(function (api, where) {
   api.versionsFrom("1.0");
 
   // Meteor core
-  api.use(['underscore','mongo','accounts-base','random']);
+  api.use(['underscore','mongo','accounts-base','random','ejson']);
   api.imply('mongo');
   
   // Third party

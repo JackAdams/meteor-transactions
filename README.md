@@ -60,13 +60,15 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 #### Things it's helpful to know
 
-1. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows:
+1. Although those look like mongo selectors in the `Posts.update` and `Posts.remove` examples above, they're really not. This package is only looking for an `_id` field in the object passed as the first parameter -- no other fields in the object are taken into account.
+
+2. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows:
 
 		tx.log = function (message) { 
 		  // Your own logging logic here
 		}
 
-2. To run all actions through your own custom permission check, write a function as follows:
+3. To run all actions through your own custom permission check, write a function as follows:
 
 		tx.checkPermission = function (action, collection, doc, modifier) {
 		  // Your permission check logic here
@@ -123,7 +125,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
   2. **Anytime During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
 
-  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
+  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Mongo.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 
   4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. E.G. `Posts.update({ _id: postId}, {$set:{foo:"bar"}}, { tx: true, context:{ postAuthorName: "Jack Black" })`
 
@@ -183,7 +185,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 16. When starting a transaction, you can write `var txid = tx.start('add post');` and then target this particular transaction for undo/redo using `tx.undo(txid)`. You can also pass a callback instead of (or in addition to) a txid value, as follows:
 
         tx.undo(function (err, res) {
-          // `res` with be true if the transaction was undone or false if it is an expired transaction
+          // `res` will be true if the transaction was undone or false if it is an expired transaction
 	      // `this` will be the tx object 
         }
 
@@ -242,7 +244,7 @@ As you can see from the roadmap, there are still some key things missing from th
 	meteor add babrahams:undo-redo
 	```
 
-	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed below) will be exposed.
+	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed above) will be exposed.
 
 	You are therefore free to:
 	

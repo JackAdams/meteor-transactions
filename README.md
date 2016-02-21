@@ -113,7 +113,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
     b. A callback can also be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err, res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` when the transaction is unsuccessful (and `res` will be false); if the transaction was successful, `res` takes the value(s) of the new _id for transactions that contain insert operations (a single string if there was one insert or an object with arrays of strings indexed by collection name if there were multiple inserts), or `true` for transactions comprising only updates and removes; `res` will be `false` if the transaction was rolled back; in the callback function context, `this` is an object of the form `{transaction_id: <transaction_id>, writes: <an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
-6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`.
+6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`. This option only works on the server, for obvious reasons.
 
 7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can set a custom context in a few different ways. 
 
@@ -226,36 +226,3 @@ We've been using the first iteration of this package (up to 0.6.21) in a complex
 * [ ] __1.0+__ - _Look into support for {multi:true}_
 
 As you can see from the roadmap, there are still some key things missing from this package. I currently use it in a production app, but it's very much a case of _use-at-your-own-risk_ right now.
-
-#### Breaking changes (sort of) from 0.6.21 -> 0.7.x and update path
-
-1. There was a substantial rewrite of the inner workings of this package (starting from 0.7.0) to make it more robust, with a focus on maintaining a recoverable app state. It's not perfect, but it's a whole lot better than its predecessor (0.6.21). A part of this was changing the storage format of transactions in the `tx.Transactions` collection, meaning 0.7.0 won't work with existing transactions. I recommend the following:
-
-	```
-	meteor mongo
-	db.transactions.remove({})
-	```
-
-	If your existing transactions simply cannot be removed, and you don't want to upgrade to the new version, `babrahams:transactions@0.6.21` in the `.meteor/packages` file will make sure you stay at the required version.  For posterity, a repo with 0.6.21 is [here](https://github.com/JackAdams/meteor-transactions-old).
-
-2. This package no longer contains the undo-redo UI widget - it can be added as a separate package using:
-
-	```
-	meteor add babrahams:undo-redo
-	```
-
-	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed above) will be exposed.
-
-	You are therefore free to:
-	
-	```
-	meteor remove babrahams:transactions
-	```
-
-	This removes this package as a top-level dependency and keeps it out of your `meteor list` results. This could be achieved more quickly by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
-
-3. The API is unchanged.
-
-__Security warning:__ actions from transactions committed on the client no longer go through your allow and deny rules -- they are sent to the server to be batch processed there (__except__ those with the `{instant: true}` parameter set -- they still go through allow/deny -- see below for more about that).  This means that if you were using the `0.6.x` version of this package and relying on your allow and deny rules for security for client side commits, you'll now need to move that security logic to the `tx.checkPermission` function -- see below for more about that.
-
-__Note:__ because this package attempts to implement something similar to a [mongo 2-phase commit](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/), it makes twice the number of db writes as the more naive implementation in `babrahams:transactions@0.6.21`.

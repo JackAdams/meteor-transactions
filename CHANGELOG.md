@@ -4,7 +4,7 @@ Meteor + Mongo Transactions
 ### v1.x
 
 - Explore Operational Transform options
-- Look into support for `{multi:true}`
+- Look into support for `{multi: true}`
 - Support for `upsert`
 - Possible support for locking documents used in pending transactions
 
@@ -17,6 +17,10 @@ Meteor + Mongo Transactions
 ### vNext
 
 - More comprehensive test coverage
+
+### v0.7.6
+
+- Closes an issue (#47) related to security, where transactions originating on the client could override the `tx.checkPermission` function on the server
 
 ### v0.7.5
 

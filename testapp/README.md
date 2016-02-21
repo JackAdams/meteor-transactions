@@ -42,7 +42,3 @@ Contained in `testapp/tests/jasmine/server/integration`, these tests run on the 
 * All Jasmine server integration test source code must be wrapped in `Jasmine.onTest(function () { /* YOUR TESTS */ });`
 
 * If you delete test files, you must manually delete the `testapp/packages/tests-proxy` folder to force Velocity to forget the deleted file
-
-
-
-

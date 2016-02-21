@@ -24,3 +24,5 @@ sanjo:jasmine
 velocity:html-reporter
 babrahams:constellation
 constellation:dump-restore
+autopublish
+insecure

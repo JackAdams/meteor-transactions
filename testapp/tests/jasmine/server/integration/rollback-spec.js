@@ -149,13 +149,14 @@ describe('rollback after updates are made', function () {
 	expect(txid).toBeDefined();
     
 	// Then try and remove it again via a transaction
+	
 	fooCollection.remove(
-      {_id: insertedFooDoc._id},
-      {
-        tx: true,
+	  {_id: insertedFooDoc._id},
+	  {
+		tx: true,
 		instant: true
-      }
-    );
+	  }
+	);
 	
 	// Check the update was made
 	var recoveredFoo = fooCollection.findOne(
@@ -177,7 +178,7 @@ describe('rollback after updates are made', function () {
 	
 	tx.commit();
 	
-	console.log("transactionDoc:", tx.Transactions.findOne({_id: txid}).items[1]);
+	// console.log("transactionDoc:", tx.Transactions.findOne({_id: txid}).items);
 	// console.log("recoveredFoo:", insertedFooDoc, fooCollection.findOne({_id: insertedFooDoc._id}));
     
 	// VERIFY

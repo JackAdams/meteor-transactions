@@ -17,7 +17,7 @@ describe('undo after multiple actions on a single doc field', function () {
       {foo: "Initial state"}, {tx: true});
     tx.commit();
 
-    insertedFooDoc = fooCollection.findOne({foo: {$exists: true}});
+    insertedFooDoc = fooCollection.findOne({foo: {$exists: true}}); console.log(fooCollection.findOne());
     expect(insertedFooDoc.transaction_id).toBeDefined();
     transaction_id = insertedFooDoc.transaction_id; 
   });

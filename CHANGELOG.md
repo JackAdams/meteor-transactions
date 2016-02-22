@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.7
+
+- Closes an issue (#48) in which Meteor.settings isn't defined for android builds and error gets thrown
+
 ### v0.7.6
 
 - Closes an issue (#47) related to security, where transactions originating on the client could override the `tx.checkPermission` function on the server

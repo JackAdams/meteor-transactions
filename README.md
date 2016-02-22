@@ -207,9 +207,7 @@ where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `M
 
 #### Production ready?
 
-We've been using the first iteration of this package (up to 0.6.21) in a complex production app for two years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely. 0.7.x has not been so thoroughly battle-tested, but does include a much-improved test suite that covers a chunk of the important functionality.
-
-0.7.x has been working well in our production app for about four months.
+We've been using this package in a complex production app for almost three years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
 #### Roadmap
 

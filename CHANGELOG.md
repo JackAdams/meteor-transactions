@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.8
+
+- Closes issues #49 (insert callbacks with collection2 not working) and #50 (undo of $set modifiers with multiple fields not restoring previous state correctly)
+
 ### v0.7.7
 
 - Closes an issue (#48) in which Meteor.settings isn't defined for android builds and error gets thrown

@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.10
+
+- Restores a semblance of latency compensation in some cases
+
 ### v0.7.9
 
 - Fixes a bug where an error is thrown unnecessarily on an empty transaction

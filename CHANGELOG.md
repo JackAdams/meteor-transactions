@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.9
+
+- Fixes a bug where an error is thrown unnecessarily on an empty transaction
+
 ### v0.7.8
 
 - Closes issues #49 (insert callbacks with collection2 not working) and #50 (undo of $set modifiers with multiple fields not restoring previous state correctly)

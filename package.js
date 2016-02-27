@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "App level transactions for Meteor + Mongo",
-  version: "0.7.8",
+  version: "0.7.9",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 
@@ -36,7 +36,7 @@ Package.onTest(function(api) {
   api.addFiles('tests/server/unit-tests.js','server');
   
   // run these with the velocity html reporter
-  // from the package top level directory
+  // from the /testapp directory
   // using the following on the command line:
   // VELOCITY_TEST_PACKAGES=1 meteor test-packages --driver-package velocity:html-reporter babrahams:transactions -p 4050
   // then navigate to localhost:4050

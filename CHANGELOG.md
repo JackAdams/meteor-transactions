@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.11
+
+- Fixes a bug with $addToSet and $pull where inverses were not being recorded correctly
+
 ### v0.7.10
 
 - Restores a semblance of latency compensation in some cases

@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.12
+
+- Fixes a bug with the ordering of actions when trying to repair a broken commit and removes `SimpleSchema.debug = true;`
+
 ### v0.7.11
 
 - Fixes a bug with $addToSet and $pull where inverses were not being recorded correctly

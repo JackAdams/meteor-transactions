@@ -8,7 +8,7 @@ babel-runtime@0.1.4
 babrahams:constellation@0.4.1
 babrahams:editable-json@0.6.3
 babrahams:temple@0.4.1
-babrahams:transactions@0.7.10
+babrahams:transactions@0.7.12
 base64@1.0.4
 binary-heap@1.0.4
 blaze@2.1.3

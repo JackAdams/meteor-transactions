@@ -3,44 +3,13 @@ App Level Transactions for Meteor + Mongo
 
 This package is used to simulate transactions (at the application level) for Mongo.
 
-Although this package aims to improve the overall data integrity of your app, __do not__ use it to write banking applications or anything like that.
+Although this package aims to improve the overall data integrity of your app, __do not__ use it to write banking applications or anything like that. Seriously, don't.
 
-Note: because this package attempts to implement something similar to a [mongo 2-phase commit](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/), it makes twice the number of db writes as the more naive implementation in `babrahams:transactions@0.6.21`.
+Note: because this package attempts to implement something similar to a [mongo 2-phase commit](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/), it makes more than twice the usual number of db writes, which has server load implications.
 
 A transaction can be a single action (insert, update or remove) on a single document, or a set of different actions across different documents.
 
 An example app is up at [http://transactions.meteor.com/](http://transactions.meteor.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
-
-#### Breaking changes (sort of) from 0.6.21 -> 0.7.x and update path
-
-1. There has been a substantial rewrite of the inner workings of this package (starting from 0.7.0) to make it more robust, with a focus on maintaining a recoverable app state. It's not perfect, but it's a whole lot better than its predecessor (0.6.21). A part of this was changing the storage format of transactions in the `tx.Transactions` collection, meaning 0.7.0 won't work with existing transactions. I recommend the following:
-
-	```
-	meteor mongo
-	db.transactions.remove({})
-	```
-
-	If your existing transactions simply cannot be removed, and you don't want to upgrade to the new version, `babrahams:transactions@0.6.21` in the `.meteor/packages` file will make sure you stay at the required version.  For posterity, a repo with 0.6.21 is [here](https://github.com/JackAdams/meteor-transactions-old).
-
-2. This package no longer contains the undo-redo UI widget - it can be added as a separate package using:
-
-	```
-	meteor add babrahams:undo-redo
-	```
-
-	If you add `babrahams:undo-redo`, this package (`babrahams:transactions`) will be automatically added as a dependency and the full API (detailed below) will be exposed.
-
-	You are therefore free to:
-	
-	```
-	meteor remove babrahams:transactions
-	```
-
-	This removes this package as a top-level dependency and keeps it out of your `meteor list` results. This could be achieved more quickly by changing `babrahams:transactions` to `babrahams:undo-redo` in your `.meteor/packages` file.
-
-3. The API is unchanged.
-
-__Security warning:__ actions from transactions committed on the client no longer go through your allow and deny rules -- they are sent to the server to be batch processed there (__except__ those with the `{instant: true}` parameter set -- they still go through allow/deny -- see below for more about that).  This means that if you were using the `0.6.x` version of this package and relying on your allow and deny rules for security for client side commits, you'll now need to move that security logic to the `tx.checkPermission` function -- see below for more about that.
 
 #### Quick Start
 
@@ -91,13 +60,15 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 #### Things it's helpful to know
 
-1. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows:
+1. Although those look like mongo selectors in the `Posts.update` and `Posts.remove` examples above, they're really not. This package is only looking for an `_id` field in the object passed as the first parameter -- no other fields in the object are taken into account.
+
+2. Logging is on by default. It's quite handy for debugging. You can turn if off by setting `tx.logging = false;`. Messages are logged to the console by default -- if you want to handle the logging yourself, you can overwrite `tx.log` as follows:
 
 		tx.log = function (message) { 
 		  // Your own logging logic here
 		}
 
-2. To run all actions through your own custom permission check, write a function as follows:
+3. To run all actions through your own custom permission check, write a function as follows:
 
 		tx.checkPermission = function (action, collection, doc, modifier) {
 		  // Your permission check logic here
@@ -115,13 +86,13 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 **It's important to understand the following points before deciding whether `babrahams:transactions` will be the right package for your app:**
 
-1. It creates a collection called `transactions` in mongodb. The Meteor collection for this is exposed via `tx.Transactions` not just as plain `Transactions`.
+1. It creates a collection called `transactions` in mongodb (or whatever you like, if you set `Meteor.settings.transactionsCollection` via a `settings.json` file). The Meteor collection for this is exposed via `tx.Transactions` not just as plain `Transactions`.
 
 2. It queues all the actions you've called in a single `tx.start() ... tx.commit()` block, doing permission checks as it goes. If a forbidden action (i.e. where `tx.checkPermission` returns `false`) is added to the queue, it will not execute any of the actions previously queued. It will clear the queue and wait for the next transaction to begin. This queue is created by monkey-patching the `insert`, `update` and `remove` methods of `Mongo.Collection` instances so that these db mutator calls are intercepted and not executed until this package has done its thing (much like `aldeed:collection2`). And, yes, this need for monkey-patching is unfortunate, but it [has to be addressed in Meteor core](https://github.com/meteor/meteor/issues/395).
 
 3. Once permission checking is complete, it executes the actions in the order they were queued. If an error is caught, it will roll back all actions that have been executed so far and will not execute any further actions. The queue will be cleared and it will wait for the next transaction.
 
-4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `tx.remove(Posts,post,{instant:true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).  For example, in a RPG where a new player gets a few items by default:
+4. You can specify a few options in the third parameter of the `tx.insert` and `tx.remove` calls (fourth parameter of `tx.update`). One of these is the "instant" option: `Posts.remove({_id: post._id}, {tx: true, instant: true});`. The effect of this is that the action on the document is taken instantly, not queued for later execution. (If a roll back is later found to be required, the action will be un-done.) This is useful if subsequent updates to other documents (in the same transaction) are based on calculations that require the first document to be changed already (e.g removed from the collection).  For example, in a RPG where a new player gets a few items by default:
 
 		tx.start('add new player');
 		var newPlayerId = Players.insert({name: "New player"}, {tx: true, instant: true}); // Instant because we need to use the new _id value returned by Players.insert
@@ -138,11 +109,11 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 	_Note: the options can also be passed as follows: `Players.insert({name: "New player"}, {tx: {instant: true}});`. This can be used to avoid potential namespace collisions with other packages that use the same options hash, such as `aldeed:collection2`. As soon as an options hash is passed as the value for `tx` (instead of `true`), this package won't consider any other options except those in the hash._
 
-5. a. For single actions within a transaction, you can pass a callback function as the next parameter after the options hash. In rare situations you might find you need to pass your callback function explicitly as `callback` in the options hash. e.g. `tx.remove(Posts,post, {instant: true, callback: function (err, res) { console.log(this, err, res); }});`. __Note:__ if the callback functions fired on individual actions (in either a single-action, auto-committed transaction or a `tx.start() ... tx.commit()` block) make changes to collections, these will __NOT__ be undoable as part of the transaction.
+5. a. For single actions within a transaction, you can pass a callback function as the next parameter after the options hash. In rare situations you might find you need to pass your callback function explicitly as `callback` in the options hash. e.g. `Posts.remove({_id: post._id}, {instant: true, callback: function (err, res) { console.log(this, err, res); }});`. __Note:__ if the callback functions fired on individual actions (in either a single-action, auto-committed transaction or a `tx.start() ... tx.commit()` block) make changes to collections, these will __NOT__ be undoable as part of the transaction.
 
-    b. A callback can also be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err, res) { console.log(this,err,res); });`. In the callback: `err` is a `Meteor.Error` when the transaction is unsuccessful (and `res` will be false); if the transaction was successful, `res` takes the value(s) of the new _id for transactions that contain insert operations (a single string if there was one insert or an object with arrays of strings indexed by collection name if there were multiple inserts), or `true` for transactions comprising only updates and removes; `res` will be `false` if the transaction was rolled back; in the callback function context, `this` is an object of the form `{transaction_id: <transaction_id>, writes: <an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
+    b. A callback can also be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err, res) { console.log(this, err, res); });`. In the callback: `err` is a `Meteor.Error` when the transaction is unsuccessful (and `res` will be false); if the transaction was successful, `res` takes the value(s) of the new _id for transactions that contain insert operations (a single string if there was one insert or an object with arrays of strings indexed by collection name if there were multiple inserts), or `true` for transactions comprising only updates and removes; `res` will be `false` if the transaction was rolled back; in the callback function context, `this` is an object of the form `{transaction_id: <transaction_id>, writes: <an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
 
-6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`.
+6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {tx: true, overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`. This option only works on the server, for obvious reasons.
 
 7. If you want to do custom filtering of the `tx.Transactions` collection in some admin view, you'll probably want to record some context for each transaction. A `context` field is added to each transaction record and should be a JSON object. By default, we add `context: {}`, but you can set a custom context in a few different ways. 
 
@@ -154,7 +125,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
   2. **Anytime During a Transaction** you may add to context with: `tx.setContext({ more_info : "something else to remember" })`
 
-  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Meteor.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set:{foo:"bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
+  3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Mongo.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set: {foo: "bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 
   4. **Manually When Adding an Action** you can pass `{context: { <Your JSON object for context> }}` into the options parameter when adding an action to the transaction. E.G. `Posts.update({ _id: postId}, {$set:{foo:"bar"}}, { tx: true, context:{ postAuthorName: "Jack Black" })`
 
@@ -214,7 +185,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 16. When starting a transaction, you can write `var txid = tx.start('add post');` and then target this particular transaction for undo/redo using `tx.undo(txid)`. You can also pass a callback instead of (or in addition to) a txid value, as follows:
 
         tx.undo(function (err, res) {
-          // `res` with be true if the transaction was undone or false if it is an expired transaction
+          // `res` will be true if the transaction was undone or false if it is an expired transaction
 	      // `this` will be the tx object 
         }
 
@@ -236,9 +207,7 @@ where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `M
 
 #### Production ready?
 
-We've been using the first iteration of this package (up to 0.6.21) in a complex production app for two years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely. 0.7.0 has not been so thoroughly battle-tested, but does include a much-improved test suite that covers a chunk of the important functionality.
-
-The production app is [Standbench](http://www.standbench.com), which provides online curriculum housing and management for schools.
+We've been using this package in a complex production app for almost three years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
 #### Roadmap
 

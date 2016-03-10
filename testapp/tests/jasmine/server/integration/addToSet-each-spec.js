@@ -270,7 +270,7 @@ describe('updates with $addToSet', function () {
       { command: '$pull', data: [ { key: 'foo', json: '{"bar":4}' } ] }
       );
     expect(txDoc.items[1].inverse).toEqual(
-      {"command":"$unset","data":[{"key":"fooBar","value":""}]}
+      {"command": "$unset", "data": [{"key": "fooBar", "value": 1}]}
       );
   })
 

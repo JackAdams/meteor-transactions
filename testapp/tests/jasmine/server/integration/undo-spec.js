@@ -26,6 +26,28 @@ describe('undo after multiple actions on a single doc field', function () {
     fooCollection.remove({});
     tx.Transactions.remove({});
   });
+  
+  it('should leave fields set that were already set', function () {
+	 // SET UP
+	 fooCollection.update({_id: insertedFooDoc._id}, {$set: {bar: 4}});
+	 // EXECUTE
+	 var txid = tx.start('make $set update that adds a field and updates a field');
+	 fooCollection.update({_id: insertedFooDoc._id}, {$set: {bar: 5, baz: 3}}, {tx: true});
+	 tx.commit();
+	 tx.undo(txid);
+	 var fooDoc = fooCollection.findOne({_id: insertedFooDoc._id});
+	 expect(fooDoc.foo).toEqual('Initial state');
+	 expect(fooDoc.bar).toEqual(4);
+	 expect(fooDoc.baz).toBeUndefined();
+	 // Now do it again with the field order reversed
+	 txid = tx.start('make another $set update that adds a field and updates a field');
+	 fooCollection.update({_id: insertedFooDoc._id}, {$set: {baz: 5, bar: 3}}, {tx: true});
+	 tx.commit();
+	 tx.undo(txid);
+	 expect(fooDoc.foo).toEqual('Initial state');
+	 expect(fooDoc.bar).toEqual(4);
+	 expect(fooDoc.baz).toBeUndefined();
+  });
  
   it ('should return to initial state', function () {
     // SETUP

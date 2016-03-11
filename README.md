@@ -176,7 +176,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 13. Under the hood, all it's doing is putting a document in the `transactions` mongodb collection, one per transaction, that records: a list of which actions were taken on which documents in which collection and then, alongside each of those, the inverse action required for an `undo` and the state of the action (`pending`, `done` or `undone`).
 
-14. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull` and `$inc`. We've got a great amount of mileage out of them so far (see below).
+14. The only `update` commands we currently support are `$set`, `$unset`, `$addToSet`, `$pull`, `$push` and `$inc`. We've got a great amount of mileage out of them so far (see below).
 
 15. There is built-in support for the popular `aldeed:collection2` package, but this is a failry volatile combination, as both packages wrap the `insert` and `update` methods on `Mongo.Collection` and both remove any options hash* before passing the call on to the native functions (while still allowing any callbacks to fire, to match the behaviour specified in the Meteor docs).  Open an issue if this package doesn't seem to work with `aldeed:collection2`.
 

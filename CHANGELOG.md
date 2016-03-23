@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.13
+
+- Closes #57 where write operations were async when they should have been sync
+
 ### v0.7.12
 
 - Fixes a bug with the ordering of actions when trying to repair a broken commit and removes `SimpleSchema.debug = true;`
@@ -36,7 +40,7 @@ Meteor + Mongo Transactions
 
 ### v0.7.8
 
-- Closes issues #49 (insert callbacks with collection2 not working) and #50 (undo of $set modifiers with multiple fields not restoring previous state correctly)
+- Closes issue #49 (insert callbacks with collection2 not working) and #50 (undo of $set modifiers with multiple fields not restoring previous state correctly)
 
 ### v0.7.7
 

@@ -9,7 +9,7 @@ Note: because this package attempts to implement something similar to a [mongo 2
 
 A transaction can be a single action (insert, update or remove) on a single document, or a set of different actions across different documents.
 
-An example app is up at [http://transactions.meteor.com/](http://transactions.meteor.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
+An example app is up at [http://transactions.taonova.com/](http://transactions.taonova.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
 
 #### Quick Start
 

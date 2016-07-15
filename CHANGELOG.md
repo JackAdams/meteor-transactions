@@ -18,6 +18,10 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.14
+
+- Added `check` package as a dependency
+
 ### v0.7.13
 
 - Closes #57 where write operations were async when they should have been sync

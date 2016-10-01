@@ -205,6 +205,10 @@ tx.collectionIndex = {
 ```
 where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `Mongo.Collection` instance variable.
 
+20. Set `tx.forceCommitBeforeStart = true;` (`false` by default) on client and/or server as a means of strictly keeping the app in a good state (at the cost of potentially messy data if there are bugs in the app). What it means is that any time a transaction is started with a `tx.start( ... )` call, it will force a commit of any open transaction first. To set this on a per-transaction basis, write `tx.start('new transaction', {forceCommitBeforeStart: true})`.
+
+21. If a transaction is idle for a set amount of time (milliseconds), it automatically gets rolled back. To change the default, set `tx.idleTimeout = 2000;` (default is 5000 ms).
+
 #### Production ready?
 
 We've been using this package in a complex production app for almost three years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.

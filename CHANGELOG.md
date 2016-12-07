@@ -18,6 +18,20 @@ Meteor + Mongo Transactions
 
 - More comprehensive test coverage
 
+### v0.7.16
+
+- Fixed the bug introduced with the client idleTimeout feature (i.e. a long wait for the server to process a committed queue of actions leads to a client-initiated rollback)
+- Updated weak dependency on `aldeed:collection2` package to version 2.10.0 (from 2.9.0)
+
+### v0.7.15
+
+- Added `forceCommitBeforeStart` option as a means of strictly keeping the app in a good state (at the cost of potentially messy data if there are bugs in the app)
+- Made the client time out and auto-rollback if a transaction is open longer than a certain (configurable) number of milliseconds
+
+### v0.7.14
+
+- Added `check` package as a dependency
+
 ### v0.7.13
 
 - Closes #57 where write operations were async when they should have been sync

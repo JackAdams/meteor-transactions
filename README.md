@@ -9,7 +9,7 @@ Note: because this package attempts to implement something similar to a [mongo 2
 
 A transaction can be a single action (insert, update or remove) on a single document, or a set of different actions across different documents.
 
-An example app is up at [http://transactions.meteor.com/](http://transactions.meteor.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
+An example app is up at [http://transactions.taonova.com/](http://transactions.taonova.com). [Github repo](https://github.com/JackAdams/transactions-example) for the example app.
 
 #### Quick Start
 
@@ -204,6 +204,10 @@ tx.collectionIndex = {
 }
 ```
 where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `Mongo.Collection` instance variable.
+
+20. Set `tx.forceCommitBeforeStart = true;` (`false` by default) on client and/or server as a means of strictly keeping the app in a good state (at the cost of potentially messy data if there are bugs in the app). What it means is that any time a transaction is started with a `tx.start( ... )` call, it will force a commit of any open transaction first. To set this on a per-transaction basis, write `tx.start('new transaction', {forceCommitBeforeStart: true})`.
+
+21. If a transaction is idle for a set amount of time (milliseconds), it automatically gets rolled back. To change the default, set `tx.idleTimeout = 2000;` (default is 5000 ms).
 
 #### Production ready?
 

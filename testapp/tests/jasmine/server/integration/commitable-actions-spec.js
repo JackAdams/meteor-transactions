@@ -18,8 +18,9 @@ describe('committable actions', function () {
     // SETUP
     var predefinedId = 'PNAJ67oTkkaH46xJz';
     tx.start('insert transaction');
-    fooCollection.insert(
-      {_id: predefinedId, foo: "After insert"}, {tx: true});
+    var origDoc = {_id: predefinedId, foo: "After insert"};
+    var insertDoc = _.clone(origDoc);
+    fooCollection.insert(insertDoc, {tx: true});
 
     // EXECUTE
     tx.commit();
@@ -29,8 +30,8 @@ describe('committable actions', function () {
 
     expect(savedDoc).toBeDefined();
     expect(savedDoc.foo).toEqual('After insert');
-
-
+    // Collection.insert should not mutate its argument.
+    expect(insertDoc).toEqual(origDoc);
   });
 
 

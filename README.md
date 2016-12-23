@@ -126,12 +126,12 @@ Note that each comment has to be removed independently. Transactions don't suppo
    1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
 
    2. **Anytime During a Transaction** you may add to context with: 
-      1. `tx.setContext({prop: "something"})` - like underscore.extend() or lodash.assign() [more info](https://lodash.com/docs/4.17.2#assign)
+      1. `tx.setContext({prop: "something"})` - like `underscore.extend()` or `lodash.assign()` [more info](https://lodash.com/docs/4.17.2#assign)
 	  
-	  and, if you overwrite `tx.lodash`, with `tx.lodash = lodash` (or whatever symbol is exported by a `lodash` package you have installed), you get access to the following two methods to help set context:
+	  And, if you overwrite `tx.lodash`, with `tx.lodash = lodash` (or whatever symbol is exported by a `lodash` package you have installed), you get access to the following two methods to help set context:
 	  
-      2. `tx.mergeContext({prop: {subvar: "something"})` - like lodash.merge() [more info](https://lodash.com/docs/4.17.2#merge)
-      3. `tx.setContextPathValue("path.to.subvar": "something")` - like lodash.set() [more info](https://lodash.com/docs/4.17.2#set)
+      2. `tx.mergeContext({prop: {subvar: "something"})` - like `lodash.merge()` [more info](https://lodash.com/docs/4.17.2#merge)
+      3. `tx.setContextPathValue("path.to.subvar": "something")` - like `lodash.set()` [more info](https://lodash.com/docs/4.17.2#set)
 
    3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Mongo.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set: {foo: "bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 

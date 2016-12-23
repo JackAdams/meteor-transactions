@@ -17,3 +17,7 @@ __Things to consider__
 __Plans__
 
 - Change the data storage format in the documents of the `transactions` collection -- or at the very least, add some further meta-data `actionNumber` (an integer that increments for each action) so that the actions can be executed in strict reverse order -- changing the format will simplify the code, or the code could be refactored to give the correct behaviour while preserving the current format. I'm leaning in favour of changing the data storage format, which would result in a lot of failing tests and no backwards compatibility, because the code is already complex enough and we need to be able to reason about it as easily as possible.
+
+**UPDATE**
+
+This is all pretty much implemented in the 0.7.x version of this package.

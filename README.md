@@ -127,6 +127,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
    2. **Anytime During a Transaction** you may add to context with: 
       1. `tx.setContext({prop: "something"})` - like underscore.extend() or lodash.assign() [more info](https://lodash.com/docs/4.17.2#assign)
+	  and, if you overwrite `tx.lodash`, with `tx.lodash = lodash` (or whatever symbol is exported by a `lodash` package you have installed), you get access to the following two methods to help set context:
       2. `tx.mergeContext({prop: {subvar: "something"})` - like lodash.merge() [more info](https://lodash.com/docs/4.17.2#merge)
       3. `tx.setContextPathValue("path.to.subvar": "something")` - like lodash.set() [more info](https://lodash.com/docs/4.17.2#set)
 

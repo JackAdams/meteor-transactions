@@ -9,6 +9,10 @@ Package.onUse(function (api, where) {
 
   api.versionsFrom("1.0");
 
+  // Import Lodash before Underscore so when Underscore is imported it will
+  // set: _ = Underscore. You can still access Lodash using "lodash" global.
+  api.use('stevezhu:lodash@4.17.2');
+
   // Meteor core
   api.use(['underscore', 'mongo', 'accounts-base', 'random', 'ejson', 'check']);
   api.imply('mongo');

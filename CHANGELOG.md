@@ -14,9 +14,21 @@ Meteor + Mongo Transactions
 - Add/improve support for other/existing mongo operators  
 - Complete test coverage and security audit
 
-### vNext
+### v0.9
 
 - More comprehensive test coverage
+
+### v0.8
+
+- Refactor package internals to make it more robust when multiple transactions are happening concurrently
+
+### v0.7.17
+
+- Fixed a bug with logging (introduced in last update) which broke a few tests that went unnoticed
+- Fixed bug in which `Collection.insert` was wrongly mutating the `newDoc` object being inserted
+- Added `tx.getContext` method
+- Added `tx.mergeContext` and `tx.setContextPathValue` methods for `lodash` users
+- Changed absolute to relative symlink from the test app to the transactions package so everyone can run tests
 
 ### v0.7.16
 

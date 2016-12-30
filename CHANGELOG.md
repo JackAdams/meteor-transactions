@@ -10,15 +10,14 @@ Meteor + Mongo Transactions
 
 ### v1.0
 
-- Refactor and document code for better maintainability
-- Add/improve support for other/existing mongo operators  
-- Complete test coverage and security audit
+- Refactor and document code for better maintainability  
+- Sufficient test coverage and security audit
 
 ### v0.9
 
-- More comprehensive test coverage
+- Add/improve support for other/existing mongo operators
 
-### v0.8
+### v0.8.0
 
 - Refactor package internals to make it more robust when multiple transactions are happening concurrently
 

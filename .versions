@@ -2,7 +2,7 @@ accounts-base@1.2.8
 allow-deny@1.0.5
 babel-compiler@6.8.4
 babel-runtime@0.1.9_1
-babrahams:transactions@0.7.17
+babrahams:transactions@0.8.0
 base64@1.0.9
 binary-heap@1.0.9
 blaze@2.1.8
@@ -29,7 +29,7 @@ htmljs@1.0.10
 id-map@1.0.8
 jquery@1.11.9
 lai:collection-extensions@0.2.1_1
-local-test:babrahams:transactions@0.7.17
+local-test:babrahams:transactions@0.8.0
 localstorage@1.0.11
 logging@1.0.14
 meteor@1.1.16

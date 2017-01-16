@@ -222,7 +222,7 @@ where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `M
 
 #### Production ready?
 
-We've been using this package in a complex production app for almost three years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
+We've been using this package in a complex production app for almost four years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
 #### Roadmap
 

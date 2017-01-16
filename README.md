@@ -154,8 +154,11 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 		tx.inverseOperations.$addToSet = function (collection, existingDoc, updateMap, opt) {
 		  var self = this, inverseCommand = '$set', formerValues = {};
+		  var _drillDown = function (obj, key) {
+		    return Meteor._get.apply(null, [obj].concat(key.split('.')));
+		  }
 		  _.each(_.keys(updateMap), function (keyName) {
-		    var formerVal = self._drillDown(existingDoc, keyName);
+		    var formerVal = _drillDown(existingDoc, keyName);
 		     if (typeof formerVal !== 'undefined') {
 		       formerValues[keyName] = formerVal;
 		     } else {

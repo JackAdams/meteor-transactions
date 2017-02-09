@@ -1,25 +1,27 @@
 Meteor + Mongo Transactions
 ===========================
 
-### v1.x
+### v1.x [WILL NEED HELP]
 
 - Explore Operational Transform options
 - Look into support for `{multi: true}`
 - Support for `upsert`
 - Possible support for locking documents used in pending transactions
 
-### v1.0
+### v1.0 [PLANNED]
 
 - Refactor and document code for better maintainability  
 - Sufficient test coverage and security audit
 
-### v0.9
+### v0.9 [PLANNED]
 
 - Add/improve support for other/existing mongo operators
 
+----
+
 ### v0.8.0
 
-- Refactor package internals to make it more robust when multiple transactions are happening concurrently
+- Refactored package internals to make it more robust when multiple transactions are happening concurrently
 
 ### v0.7.17
 

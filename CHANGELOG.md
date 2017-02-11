@@ -19,6 +19,15 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.1
+
+- Options to rethrow exceptions caught during a commit (#72)
+- Fixes for removed documents not being saved properly (#73)
+- Fix for hard removed documents that prevented them from being re-removed after a transaction (#74)
+- Fixed a part of code that wasn't refactored properly for multiple transactions (#76)
+- Upserts throw explicit exceptions (#78)
+- You can now pass a value for `rethrowCommitError`, `forceCommitBeforeStart`, `useExistingTransaction` (all `false` by default) in the options hash when starting a transaction that will auto-commit
+
 ### v0.8.0
 
 - Refactored package internals to make it more robust when multiple transactions are happening concurrently

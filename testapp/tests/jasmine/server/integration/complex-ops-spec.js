@@ -19,7 +19,7 @@ describe('upsert', function () {
   });
  
   it ('should throw an exception', function () {
-    expect(function() { fooCollection.upsert({_id: "myId"}, {$set: {a: 1}}, {tx: true}); }).toThrowError(/does not support upsert/);
+    expect(function() { fooCollection.upsert({_id: "myId"}, {$set: {a: 1}}, {tx: true}); }).toThrowError(/upsert-attempted-in-transaction/);
   });
 
 });

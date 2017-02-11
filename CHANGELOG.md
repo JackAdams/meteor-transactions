@@ -19,6 +19,9 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.2
+- Accept an object literal as first param `tx.start` calls to provide an options hash; previously only accepted string for first param (description text) and object literal for second param (options hash). One of the fields of the options hash can be `description`
+
 ### v0.8.1
 
 - Options to rethrow exceptions caught during a commit (#72)

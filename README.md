@@ -111,7 +111,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 5. a. For single actions within a transaction, you can pass a callback function as the next parameter after the options hash. In rare situations you might find you need to pass your callback function explicitly as `callback` in the options hash. e.g. `Posts.remove({_id: post._id}, {instant: true, callback: function (err, res) { console.log(this, err, res); }});`. __Note:__ if the callback functions fired on individual actions (in either a single-action, auto-committed transaction or a `tx.start() ... tx.commit()` block) make changes to collections, these will __NOT__ be undoable as part of the transaction.
 
-    b. A callback can also be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err, res) { console.log(this, err, res); });`. In the callback: `err` is a `Meteor.Error` when the transaction is unsuccessful (and `res` will be false); if the transaction was successful, `res` takes the value(s) of the new _id for transactions that contain insert operations (a single string if there was one insert or an object with arrays of strings indexed by collection name if there were multiple inserts), or `true` for transactions comprising only updates and removes; `res` will be `false` if the transaction was rolled back; in the callback function context, `this` is an object of the form `{transaction_id: <transaction_id>, writes: <an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions).
+    b. A callback can also be passed as the parameter of the `commit` function, as follows: `tx.commit(function(err, res) { console.log(this, err, res); });`. In the callback: `err` is a `Meteor.Error` when the transaction is unsuccessful (and `res` will be false); if the transaction was successful, `res` takes the value(s) of the new _id for transactions that contain insert operations (a single string if there was one insert or an object with arrays of strings indexed by collection name if there were multiple inserts), or `true` for transactions comprising only updates and removes; `res` will be `false` if the transaction was rolled back; in the callback function context, `this` is an object of the form `{transaction_id: <transaction_id>, writes: <an object containing all inserts, updates and removes>}` (`writes` is not set for unsuccessful transactions). If you want the commit function to actually throw errors, rather than swallow them and pass them to the callback, set `tx.rethrowCommitError = true;` (`false` by default); or, for individual transactions, pass `rethrowCommitError: true` in the options hash when starting a transaction.
 
 6. Another option is `overridePermissionCheck`: `Posts.remove({_id: post_id}, {tx: true, overridePermissionCheck: true});`. This can be used when your generic `tx.checkPermission` function is a little over-zealous. Be sure to wrap your transaction calls in some other permission check logic if you're going to `overridePermissionCheck`. This option only works on the server, for obvious reasons.
 
@@ -126,9 +126,12 @@ Note that each comment has to be removed independently. Transactions don't suppo
    1. **When Starting a Transaction** you can set context like this: `tx.start('add comments', {context: {post_id: "dgt234rehe346ijhh"}})`
 
    2. **Anytime During a Transaction** you may add to context with: 
-      1. `tx.setContext({prop: "something"})` - like underscore.extend() or lodash.assign() [more info](https://lodash.com/docs/4.17.2#assign)
-      2. `tx.mergeContext({prop: {subvar: "something"})` - like lodash.merge() [more info](https://lodash.com/docs/4.17.2#merge)
-      3. `tx.setContextPathValue("path.to.subvar": "something")` - like lodash.set() [more info](https://lodash.com/docs/4.17.2#set)
+      1. `tx.setContext({prop: "something"})` - like `underscore.extend()` or `lodash.assign()` [more info](https://lodash.com/docs/4.17.2#assign)
+	  
+	  And, if you overwrite `tx.lodash`, with `tx.lodash = lodash` (or whatever symbol is exported by a `lodash` package you have installed), you get access to the following two methods to help set context:
+	  
+      2. `tx.mergeContext({prop: {subvar: "something"})` - like `lodash.merge()` [more info](https://lodash.com/docs/4.17.2#merge)
+      3. `tx.setContextPathValue("path.to.subvar": "something")` - like `lodash.set()` [more info](https://lodash.com/docs/4.17.2#set)
 
    3. **Automatically When Adding an Action** you may override the function `tx.makeContext = function(action, collection, doc, modifier) { ... }` to add to context based on each action. `action` is "update", "remove", etc. `collection` is a reference to the Mongo.Collection, `doc` is the object being modified, and `modifier` is the mongo modifier e.g. `{$set: {foo: "bar"}}`. Remember that **last write wins** if multiple actions happen in the same transaction. 
 
@@ -151,8 +154,11 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 		tx.inverseOperations.$addToSet = function (collection, existingDoc, updateMap, opt) {
 		  var self = this, inverseCommand = '$set', formerValues = {};
+		  var _drillDown = function (obj, key) {
+		    return Meteor._get.apply(null, [obj].concat(key.split('.')));
+		  }
 		  _.each(_.keys(updateMap), function (keyName) {
-		    var formerVal = self._drillDown(existingDoc, keyName);
+		    var formerVal = _drillDown(existingDoc, keyName);
 		     if (typeof formerVal !== 'undefined') {
 		       formerValues[keyName] = formerVal;
 		     } else {
@@ -165,11 +171,11 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 	Note that supplying a `inverse` options property in an individual update always takes precedence over the functions in `tx.inverseOperations`. 
 
-9. The transaction queue is processed entirely on the server, but can be built on the client __OR__ the server (not both).  You can't mix client-side changes and server-side changes (i.e. Meteor methods) in a single transaction. If the transaction is committed on the client, then an array of actions will be sent to the server via a method for processing. __However__, if you perform actions with `{instant:true}` on the client, these will be sent immediately to the server as regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. And remember, the `tx.permissionCheck` function is all that stands between transaction code executed on the client and your database.
+9. The transaction queue is processed entirely on the server, but can be built on the client __OR__ the server (not both).  You can't mix client-side changes and server-side changes (i.e. Meteor methods) in a single transaction. If the transaction is committed on the client, then an array of actions will be sent to the server via a method for processing. __However__, if you perform actions with `{instant: true}` on the client, these will be sent immediately to the server as regular "insert", "udpate" and "remove" methods, so each action will have to get through your allow and deny rules. This means that your `tx.permissionCheck` function will need to be aligned fairly closely to your `allow` and `deny` rules in order to get the expected results. And remember, the `tx.permissionCheck` function is all that stands between transaction code executed on the client and your database.
 
 10. Fields are added to documents that are affected by transactions. `transaction_id` is added to any document that is inserted, updated or soft-deleted via a transaction. This package takes care of updating your schema to allow for this if you are using the `aldeed:collection2` package.
 
-11. The default setting is `tx.softDelete = false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This can default can be changed at run time by setting `tx.softDelete = true`. Or, for finer grained management, the `softDelete: true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted: <mongo ISO date object>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted: {$exists: false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete = true` and dealing with the pain.
+11. The default setting is `tx.softDelete = false`, meaning documents that are removed are taken out of their own collection and stored in a document in the `transactions` collection. This default can be changed at run time by setting `tx.softDelete = true`. Or, for finer grained management, the `softDelete: true` option can be passed on individual `remove` calls. If `softDelete` is `true`, `deleted: <mongo ISO date object>` will be added to the removed document, and then this `deleted` field is `$unset` when the action is undone. This means that the `find` and `findOne` calls in your Meteor method calls and publications will need `,deleted: {$exists: false}` in the selector in order to keep deleted documents away from the client, if that's what you want. This is, admittedly, a pain having to handle the check on the `deleted` field yourself, but it's less prone to error than having a document gone from the database and sitting in a stale state in the `transactions` collection where it won't be updated by migrations, etc. For this reason, we recommend setting `tx.softDelete = true` and dealing with the pain.
 
     __Note:__ When doing a remove on the client using a transaction with `softDelete` set to `false` and `{instant: true}`, only the _published_ fields of the document are stored for retrieval.  So if a document with only some of its fields published is removed on the client and then that is undone, there will be data loss (the unpublished fields will be gone from the db) which could cause your app to break or behave strangely, depending on how those fields were used.  To prevent this, there are three options:
 
@@ -216,7 +222,7 @@ where `'posts'` is the name of the Mongo collection and `Posts` is the Meteor `M
 
 #### Production ready?
 
-We've been using this package in a complex production app for almost three years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
+We've been using this package in a complex production app for almost four years and it's never given us any trouble. That said, we have a fairly small user base and those users perform writes infrequently, so concurrent writes to the same document are unlikely.
 
 #### Roadmap
 
@@ -226,9 +232,9 @@ We've been using this package in a complex production app for almost three years
 * [x] __0.5__ - ~~Wrap `Mongo.Collection` `insert`, `update` and `remove` methods to create less of an all-or-nothing API~~
 * [x] __0.6__ - ~~Store removed documents in the transaction document itself and actually remove them from collections as a default behaviour (`softDelete:true` can be passed to set the deleted field instead)~~
 * [x] __0.7__ - ~~Implement something like [the mongo two-phase commit approach](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) (see [issue #5](https://github.com/JackAdams/meteor-transactions/issues/5)) and factor out undo/redo UI to a separate package~~
-* [ ] __0.8__ - Add more test coverage and refactor code for better maintainability
+* [x] __0.8__ ~~- Add more test coverage and refactor code for better maintainability~~
 * [ ] __0.9__ - Add/improve support for other/existing mongo operators  
-* [ ] __1.0__ - Complete test coverage and security audit  
+* [ ] __1.0__ - Sufficient test coverage and security audit  
 * [ ] __1.0+__ - _Operational Transform_
 * [ ] __1.0+__ - _Look into support for {multi:true}_
 

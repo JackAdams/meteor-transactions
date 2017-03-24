@@ -1,22 +1,47 @@
 Meteor + Mongo Transactions
 ===========================
 
-### v1.x
+### v1.x [WILL NEED HELP]
 
 - Explore Operational Transform options
 - Look into support for `{multi: true}`
 - Support for `upsert`
 - Possible support for locking documents used in pending transactions
 
-### v1.0
+### v1.0 [PLANNED]
 
-- Refactor and document code for better maintainability
-- Add/improve support for other/existing mongo operators  
-- Complete test coverage and security audit
+- Refactor and document code for better maintainability  
+- Sufficient test coverage and security audit
 
-### vNext
+### v0.9 [PLANNED]
 
-- More comprehensive test coverage
+- Add/improve support for other/existing mongo operators
+
+----
+
+### v0.8.2
+- Accept an object literal as first param `tx.start` calls to provide an options hash; previously only accepted string for first param (description text) and object literal for second param (options hash). One of the fields of the options hash can be `description`
+
+### v0.8.1
+
+- Options to rethrow exceptions caught during a commit (#72)
+- Fixes for removed documents not being saved properly (#73)
+- Fix for hard removed documents that prevented them from being re-removed after a transaction (#74)
+- Fixed a part of code that wasn't refactored properly for multiple transactions (#76)
+- Upserts throw explicit exceptions (#78)
+- You can now pass a value for `rethrowCommitError`, `forceCommitBeforeStart`, `useExistingTransaction` (all `false` by default) in the options hash when starting a transaction that will auto-commit
+
+### v0.8.0
+
+- Refactored package internals to make it more robust when multiple transactions are happening concurrently
+
+### v0.7.17
+
+- Fixed a bug with logging (introduced in last update) which broke a few tests that went unnoticed
+- Fixed bug in which `Collection.insert` was wrongly mutating the `newDoc` object being inserted
+- Added `tx.getContext` method
+- Added `tx.mergeContext` and `tx.setContextPathValue` methods for `lodash` users
+- Changed absolute to relative symlink from the test app to the transactions package so everyone can run tests
 
 ### v0.7.16
 

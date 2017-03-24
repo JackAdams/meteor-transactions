@@ -321,8 +321,11 @@ function bruteForceAddToSetInverse (collection, existingDoc, updateMap, opt) {
   // Brute force approach to ensure previous array is restored on undo
   // even if $addToSet uses sub-modifiers like $each / $slice
   // console.log('existingDoc:'+JSON.stringify(existingDoc));
+  var _drillDown = function (obj, key) {
+	return Meteor._get.apply(null, [obj].concat(key.split('.')));  
+  }
   _.each(_.keys(updateMap), function (keyName) {
-    var formerVal = self._drillDown(existingDoc,keyName);
+    var formerVal = _drillDown(existingDoc, keyName);
      if (typeof formerVal !== 'undefined') {
       formerValues[keyName] = formerVal;
      } else {

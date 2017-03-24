@@ -142,12 +142,7 @@ Note that each comment has to be removed independently. Transactions don't suppo
 
 		"inverse": {
 		  "command": "$set",
-		  "data": [
-			{
-			  "key": "text",
-			  "value": "My old post text"
-			}
-		  ]
+		  "data": { "fieldName": "fieldValue" }
 		}
 
 	If you want to override the default inverse for a certain update operation, you can supply your own function in the `tx.inverseOperations` hash.  For example, if you wanted to restore the entire current state of an array field after a `$push` or `$addToSet` operation, you could implement it like this:

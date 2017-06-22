@@ -56,9 +56,9 @@ describe('state after hardware failure', function () {
     expect(recoveredFoo).toBeUndefined();
     // Check transaction
     var txDoc = tx.Transactions.findOne({_id: transaction_id});
-    expect(txDoc.items[0].state).toEqual("undone");
+    expect(txDoc.items[0].state).toEqual("rolledBack");
     expect(txDoc.items[1].state).toEqual("pending");
-    expect(txDoc.state).toEqual("undone");
+    expect(txDoc.state).toEqual("rolledBack");
     
   })
 

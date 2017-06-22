@@ -19,7 +19,13 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.3
+
+- Changed states of items on a transaction and the transaction state itself to `rolledBack` when the `repairMode` is set to `rollback` (it was previously `undone`, which was deceptive and not what we're after - i.e. removing the transaction from the mix completely)
+- Added a second parameter (`retryFailedRepairs` - boolean) to the function `tx._repairAllIncomplete(mode, retryFailedRepairs)`, in case anyone wants to force another attempt to repair transactions that have have already failed to be repaired
+
 ### v0.8.2
+
 - Accept an object literal as first param `tx.start` calls to provide an options hash; previously only accepted string for first param (description text) and object literal for second param (options hash). One of the fields of the options hash can be `description`
 
 ### v0.8.1

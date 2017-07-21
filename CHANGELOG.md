@@ -19,6 +19,10 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.5
+
+- Fix for an issue where transactions with `overridePermissionCheck = true` that were successful on the server, but unsuccessful when simulated on the client, left the client in a bad state
+
 ### v0.8.4
 
 - Merged PR that retries repair of transactions that were being repaired during an app crash, when `retryFailedRepairs` is `true`

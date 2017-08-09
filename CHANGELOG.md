@@ -19,6 +19,14 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.5
+
+- Fix for an issue where transactions with `overridePermissionCheck = true` that were successful on the server, but unsuccessful when simulated on the client, left the client in a bad state
+
+### v0.8.4
+
+- Merged PR that retries repair of transactions that were being repaired during an app crash, when `retryFailedRepairs` is `true`
+
 ### v0.8.3
 
 - Changed states of items on a transaction and the transaction state itself to `rolledBack` when the `repairMode` is set to `rollback` (it was previously `undone`, which was deceptive and not what we're after - i.e. removing the transaction from the mix completely)

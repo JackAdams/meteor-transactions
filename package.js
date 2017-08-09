@@ -1,7 +1,7 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "App level transactions for Meteor + Mongo",
-  version: "0.8.3",
+  version: "0.8.5",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 

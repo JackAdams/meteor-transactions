@@ -58,6 +58,8 @@ If you want a transaction that encompasses actions on several documents, you nee
 
 Note that each comment has to be removed independently. Transactions don't support `{multi: true}`.
 
+If you'd like to disable automatic starting of transactions then you can set the config prop `tx.allowAutoTransaction = false`. If you set this, an error will be thrown if you accidentally do a transaction action without calling `tx.start()` first. 
+
 #### Things it's helpful to know
 
 1. Although those look like mongo selectors in the `Posts.update` and `Posts.remove` examples above, they're really not. This package is only looking for an `_id` field in the object passed as the first parameter -- no other fields in the object are taken into account.

@@ -19,6 +19,10 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.6
+
+- Merged PR that lets you set `tx.allowAutoTransaction = false` to disable default behaviour of auto-starting a transaction if there's no explicit tx.start() call
+
 ### v0.8.5
 
 - Fix for an issue where transactions with `overridePermissionCheck = true` that were successful on the server, but unsuccessful when simulated on the client, left the client in a bad state

@@ -19,6 +19,14 @@ Meteor + Mongo Transactions
 
 ----
 
+### v0.8.8
+
+- Downgraded `socialize:server-time` dependency
+
+### v0.8.7
+
+- Updated `socialize:server-time` dependency and removed weak dependency on `aldeed:collection2`
+
 ### v0.8.6
 
 - Merged PR that lets you set `tx.allowAutoTransaction = false` to disable default behaviour of auto-starting a transaction if there's no explicit tx.start() call

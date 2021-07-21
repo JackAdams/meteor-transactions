@@ -1,13 +1,13 @@
 Package.describe({
   name: "babrahams:transactions",
   summary: "App level transactions for Meteor + Mongo",
-  version: "0.8.8",
+  version: "0.8.11",
   git: "https://github.com/jackadams/meteor-transactions.git"
 });
 
 Package.onUse(function (api, where) {
 
-  api.versionsFrom("1.0");
+  api.versionsFrom(['1.8.2', '2.3']);
 
   // Meteor core
   api.use(['underscore', 'mongo', 'accounts-base', 'random', 'ejson', 'check']);
@@ -19,8 +19,8 @@ Package.onUse(function (api, where) {
   api.use('socialize:server-time@0.1.2');
 
   // Transactions package
-  api.add_files('lib/transactions-common.js', ['client', 'server']);
-  api.add_files('lib/transactions-server.js', 'server');
+  api.addFiles('lib/transactions-common.js', ['client', 'server']);
+  api.addFiles('lib/transactions-server.js', 'server');
   
   if (api.export) {
     api.export('tx');

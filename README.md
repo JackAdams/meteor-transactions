@@ -1,6 +1,8 @@
 App Level Transactions for Meteor + Mongo
 -----------------------------------------
 
+The package is being maintained, so it remains usable with the latest version of Meteor, but there is no further active development planned. Consider using Mongo's native transactions, rather than the app-level transactions that this package makes available.
+
 This package is used to simulate transactions (at the application level) for Mongo.
 
 Although this package aims to improve the overall data integrity of your app, __do not__ use it to write banking applications or anything like that. Seriously, don't.

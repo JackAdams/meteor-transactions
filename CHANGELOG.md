@@ -8,16 +8,24 @@ Meteor + Mongo Transactions
 - Support for `upsert`
 - Possible support for locking documents used in pending transactions
 
-### v1.0 [PLANNED]
+### v1.0 [NO LONGER PLANNED]
 
 - Refactor and document code for better maintainability  
 - Sufficient test coverage and security audit
 
-### v0.9 [PLANNED]
+### v0.9 [NO LONGER PLANNED]
 
 - Add/improve support for other/existing mongo operators
 
 ----
+
+### v0.8.11
+
+- Changes to package required by Meteor 2.3
+
+### v0.8.9 & v0.8.10
+
+- Version bump as per 1.8.2 instructions in [Meteor changelog](https://github.com/meteor/meteor/blob/devel/History.md)
 
 ### v0.8.8
 
